@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Project 0 &mdash; CS280A &mdash; Andrew Park</title>
+  <link rel="stylesheet" href="../../assets/style.css" />
+</head>
+<body>
+  <header class="site-header">
+    <div class="site-header__inner">
+      <a class="brand" href="../../index.html">Andrew <span>Park</span></a>
+      <nav class="nav">
+        <a href="../../index.html">Home</a>
+        <a href="../index.html" class="is-active">CS280A</a>
+      </nav>
+    </div>
+  </header>
+
+  <main>
+    <a class="back-link" href="../index.html">&larr; CS280A</a>
+
+    <p class="eyebrow">CS280A &middot; Project 0</p>
+    <h1 class="page-title">Becoming Friends with Your Camera</h1>
+    <p class="lede">
+      A short photographic study of how camera distance, focal length, and
+      movement change what the lens sees.
+    </p>
+
+    <!-- ---------- Part 1 ---------- -->
+    <section class="part" id="part1">
+      <p class="part__label">Part 1</p>
+      <h2 class="part__title">The Selfie Comparison</h2>
+      <p>
+        Two portraits framed to the same face size: one shot at arm's length
+        (~30&nbsp;cm), the other from about 2&nbsp;m away and zoomed in. Up close,
+        the distance ratio between the nose and the ears is large, so the nose
+        and forehead balloon outward. Stepping back evens out those ratios and
+        gives the more flattering, natural proportions photographers rely on.
+      </p>
+      <div class="pair">
+        <figure>
+          <img src="./Part1/selfie-close.jpg" alt="Selfie taken at arm's length, roughly 30 cm away" />
+          <figcaption>Close &mdash; arm's length (~30&nbsp;cm). Nose and forehead appear enlarged.</figcaption>
+        </figure>
+        <figure>
+          <img src="./Part1/selfie-far.jpg" alt="Selfie taken from about 2 meters away with zoom" />
+          <figcaption>Far &mdash; ~2&nbsp;m with zoom. Proportions look natural.</figcaption>
+        </figure>
+      </div>
+    </section>
+
+    <!-- ---------- Part 2 ---------- -->
+    <section class="part" id="part2">
+      <p class="part__label">Part 2</p>
+      <h2 class="part__title">Architectural Perspective Compression</h2>
+      <p>
+        The same lamp post and building shot two ways. From far away with heavy
+        zoom, depth collapses and the scene looks flattened. From up close with
+        no zoom, the near-to-far distance ratio is dramatic and the scene feels
+        deep. Perspective is set by where the camera stands, not by the zoom.
+      </p>
+      <div class="pair">
+        <figure>
+          <img src="./Part2/arch-far.jpg" alt="Lamp post and building photographed from far away with zoom" />
+          <figcaption>Far + zoom &mdash; depth compressed, scene flattened.</figcaption>
+        </figure>
+        <figure>
+          <img src="./Part2/arch-close.jpg" alt="Lamp post and building photographed from up close without zoom" />
+          <figcaption>Close, no zoom &mdash; exaggerated depth, lamp post looms.</figcaption>
+        </figure>
+      </div>
+    </section>
+
+    <!-- ---------- Part 3 ---------- -->
+    <section class="part" id="part3">
+      <p class="part__label">Part 3</p>
+      <h2 class="part__title">The Dolly Zoom</h2>
+      <p>
+        The cinematic "Vertigo" effect. The camera walks backward while zooming
+        in, so the subject stays the same size while the background appears to
+        swell and warp behind it. The GIF below cycles through the three frames I
+        captured; the stills are shown underneath.
+      </p>
+      <div class="gif-wrap">
+        <img src="./Part3/dolly-zoom.gif" alt="Animated dolly zoom: the knitted cat stays fixed while the background scales" />
+      </div>
+      <div class="frames">
+        <figure>
+          <img src="./Part3/frame1.jpg" alt="Dolly zoom frame 1" />
+          <figcaption>Frame 1 &mdash; close, wide.</figcaption>
+        </figure>
+        <figure>
+          <img src="./Part3/frame2.jpg" alt="Dolly zoom frame 2" />
+          <figcaption>Frame 2 &mdash; stepping back, zooming in.</figcaption>
+        </figure>
+        <figure>
+          <img src="./Part3/frame3.jpg" alt="Dolly zoom frame 3" />
+          <figcaption>Frame 3 &mdash; far, tight zoom.</figcaption>
+        </figure>
+      </div>
+    </section>
+  </main>
+
+  <footer class="site-footer">
+    <div class="site-footer__inner">
+      &copy; <span id="yr"></span> Andrew Park &middot; CS280A, UC Berkeley
+    </div>
+  </footer>
+  <script>document.getElementById("yr").textContent = new Date().getFullYear();</script>
+</body>
+</html>
