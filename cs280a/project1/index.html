@@ -364,6 +364,230 @@
         <img src="./Part3/colormap-sweep.jpg" alt="Grid showing the color-mapped composite at six different values of the a_g parameter, from -0.30 to -0.05" />
       </figure>
     </section>
+
+    <!-- ---------- Part 4 ---------- -->
+    <section class="part" id="part4">
+      <p class="part__label">Part 4</p>
+      <h2 class="part__title">Final Results</h2>
+      <p>
+        Every image, including all the modification, processed end to end: multi-scale
+        pyramid alignment (gradient-based for emir.tif), automatic border
+        cropping, automatic contrast, white balance, and the final 3&times;3
+        color mapping matrix. "Before" is the plain NCC pyramid alignment;
+        "after" has every bell and whistle applied.
+      </p>
+      <p>
+        <strong>Note:</strong> the color mapping matrix is tuned globally,
+        not per-image, so it doesn't always help. On <code>siren.tif</code>
+        it removes too much green. The lilac bush's leaves come out
+        duller and more olive than the plain aligned version, since the
+        matrix was tuned against a scene with a different color balance.
+      </p>
+
+      <p style="margin-bottom: 6px;"><strong>cathedral.jpg</strong></p>
+      <div class="pair">
+        <figure>
+          <img src="./Final/cathedral-before.jpg" alt="cathedral.jpg with NCC pyramid alignment only" />
+          <figcaption>Before &mdash; NCC pyramid alignment only.</figcaption>
+        </figure>
+        <figure>
+          <img src="./Final/cathedral-after.jpg" alt="cathedral.jpg with the full pipeline applied" />
+          <figcaption>After &mdash; full pipeline.</figcaption>
+        </figure>
+      </div>
+
+      <p style="margin: 28px 0 6px;"><strong>church.tif</strong></p>
+      <div class="pair">
+        <figure>
+          <img src="./Final/church-before.jpg" alt="church.tif with NCC pyramid alignment only" />
+          <figcaption>Before &mdash; NCC pyramid alignment only.</figcaption>
+        </figure>
+        <figure>
+          <img src="./Final/church-after.jpg" alt="church.tif with the full pipeline applied" />
+          <figcaption>After &mdash; full pipeline.</figcaption>
+        </figure>
+      </div>
+
+      <p style="margin: 28px 0 6px;"><strong>emir.tif</strong></p>
+      <div class="pair">
+        <figure>
+          <img src="./Final/emir-before.jpg" alt="emir.tif with NCC pyramid alignment only" />
+          <figcaption>Before &mdash; NCC pyramid alignment only.</figcaption>
+        </figure>
+        <figure>
+          <img src="./Final/emir-after.jpg" alt="emir.tif with the full pipeline applied" />
+          <figcaption>After &mdash; full pipeline.</figcaption>
+        </figure>
+      </div>
+
+      <p style="margin: 28px 0 6px;"><strong>harvesters.tif</strong></p>
+      <div class="pair">
+        <figure>
+          <img src="./Final/harvesters-before.jpg" alt="harvesters.tif with NCC pyramid alignment only" />
+          <figcaption>Before &mdash; NCC pyramid alignment only.</figcaption>
+        </figure>
+        <figure>
+          <img src="./Final/harvesters-after.jpg" alt="harvesters.tif with the full pipeline applied" />
+          <figcaption>After &mdash; full pipeline.</figcaption>
+        </figure>
+      </div>
+
+      <p style="margin: 28px 0 6px;"><strong>icon.tif</strong></p>
+      <div class="pair">
+        <figure>
+          <img src="./Final/icon-before.jpg" alt="icon.tif with NCC pyramid alignment only" />
+          <figcaption>Before &mdash; NCC pyramid alignment only.</figcaption>
+        </figure>
+        <figure>
+          <img src="./Final/icon-after.jpg" alt="icon.tif with the full pipeline applied" />
+          <figcaption>After &mdash; full pipeline.</figcaption>
+        </figure>
+      </div>
+
+      <p style="margin: 28px 0 6px;"><strong>ilemselga.tif</strong></p>
+      <div class="pair">
+        <figure>
+          <img src="./Final/ilemselga-before.jpg" alt="ilemselga.tif with NCC pyramid alignment only" />
+          <figcaption>Before &mdash; NCC pyramid alignment only.</figcaption>
+        </figure>
+        <figure>
+          <img src="./Final/ilemselga-after.jpg" alt="ilemselga.tif with the full pipeline applied" />
+          <figcaption>After &mdash; full pipeline.</figcaption>
+        </figure>
+      </div>
+
+      <p style="margin: 28px 0 6px;"><strong>melons.tif</strong></p>
+      <div class="pair">
+        <figure>
+          <img src="./Final/melons-before.jpg" alt="melons.tif with NCC pyramid alignment only" />
+          <figcaption>Before &mdash; NCC pyramid alignment only.</figcaption>
+        </figure>
+        <figure>
+          <img src="./Final/melons-after.jpg" alt="melons.tif with the full pipeline applied" />
+          <figcaption>After &mdash; full pipeline.</figcaption>
+        </figure>
+      </div>
+
+      <p style="margin: 28px 0 6px;"><strong>monastery.jpg</strong></p>
+      <div class="pair">
+        <figure>
+          <img src="./Final/monastery-before.jpg" alt="monastery.jpg with NCC pyramid alignment only" />
+          <figcaption>Before &mdash; NCC pyramid alignment only.</figcaption>
+        </figure>
+        <figure>
+          <img src="./Final/monastery-after.jpg" alt="monastery.jpg with the full pipeline applied" />
+          <figcaption>After &mdash; full pipeline.</figcaption>
+        </figure>
+      </div>
+
+      <p style="margin: 28px 0 6px;"><strong>My own 1</strong></p>
+      <div class="pair">
+        <figure>
+          <img src="./Final/myown_master-pnp-prok-00100-00194a-before.jpg" alt="My own balcony photo with NCC pyramid alignment only" />
+          <figcaption>Before &mdash; NCC pyramid alignment only.</figcaption>
+        </figure>
+        <figure>
+          <img src="./Final/myown_master-pnp-prok-00100-00194a-after.jpg" alt="My own balcony photo with the full pipeline applied" />
+          <figcaption>After &mdash; full pipeline.</figcaption>
+        </figure>
+      </div>
+
+      <p style="margin: 28px 0 6px;"><strong>My own 2</strong></p>
+      <div class="pair">
+        <figure>
+          <img src="./Final/myown_master-pnp-prok-00200-00214a-before.jpg" alt="My own lakeside town photo with NCC pyramid alignment only" />
+          <figcaption>Before &mdash; NCC pyramid alignment only.</figcaption>
+        </figure>
+        <figure>
+          <img src="./Final/myown_master-pnp-prok-00200-00214a-after.jpg" alt="My own lakeside town photo with the full pipeline applied" />
+          <figcaption>After &mdash; full pipeline.</figcaption>
+        </figure>
+      </div>
+
+      <p style="margin: 28px 0 6px;"><strong>My own 3</strong></p>
+      <div class="pair">
+        <figure>
+          <img src="./Final/myown_master-pnp-prok-00200-00218a-before.jpg" alt="My own hillside building photo with NCC pyramid alignment only" />
+          <figcaption>Before &mdash; NCC pyramid alignment only.</figcaption>
+        </figure>
+        <figure>
+          <img src="./Final/myown_master-pnp-prok-00200-00218a-after.jpg" alt="My own hillside building photo with the full pipeline applied" />
+          <figcaption>After &mdash; full pipeline.</figcaption>
+        </figure>
+      </div>
+
+      <p style="margin: 28px 0 6px;"><strong>religous_painting.tif</strong></p>
+      <div class="pair">
+        <figure>
+          <img src="./Final/religous_painting-before.jpg" alt="religous_painting.tif with NCC pyramid alignment only" />
+          <figcaption>Before &mdash; NCC pyramid alignment only.</figcaption>
+        </figure>
+        <figure>
+          <img src="./Final/religous_painting-after.jpg" alt="religous_painting.tif with the full pipeline applied" />
+          <figcaption>After &mdash; full pipeline.</figcaption>
+        </figure>
+      </div>
+
+      <p style="margin: 28px 0 6px;"><strong>self_portrait.tif</strong></p>
+      <div class="pair">
+        <figure>
+          <img src="./Final/self_portrait-before.jpg" alt="self_portrait.tif with NCC pyramid alignment only" />
+          <figcaption>Before &mdash; NCC pyramid alignment only.</figcaption>
+        </figure>
+        <figure>
+          <img src="./Final/self_portrait-after.jpg" alt="self_portrait.tif with the full pipeline applied" />
+          <figcaption>After &mdash; full pipeline.</figcaption>
+        </figure>
+      </div>
+
+      <p style="margin: 28px 0 6px;"><strong>siren.tif</strong></p>
+      <div class="pair">
+        <figure>
+          <img src="./Final/siren-before.jpg" alt="siren.tif with NCC pyramid alignment only, showing vivid natural green leaves" />
+          <figcaption>Before &mdash; NCC pyramid alignment only.</figcaption>
+        </figure>
+        <figure>
+          <img src="./Final/siren-after.jpg" alt="siren.tif with the full pipeline applied, leaves duller and more olive after color mapping" />
+          <figcaption>After &mdash; full pipeline. Leaves lose saturation &mdash; too much green removed.</figcaption>
+        </figure>
+      </div>
+
+      <p style="margin: 28px 0 6px;"><strong>three_generations.tif</strong></p>
+      <div class="pair">
+        <figure>
+          <img src="./Final/three_generations-before.jpg" alt="three_generations.tif with NCC pyramid alignment only" />
+          <figcaption>Before &mdash; NCC pyramid alignment only.</figcaption>
+        </figure>
+        <figure>
+          <img src="./Final/three_generations-after.jpg" alt="three_generations.tif with the full pipeline applied" />
+          <figcaption>After &mdash; full pipeline.</figcaption>
+        </figure>
+      </div>
+
+      <p style="margin: 28px 0 6px;"><strong>tobolsk.jpg</strong></p>
+      <div class="pair">
+        <figure>
+          <img src="./Final/tobolsk-before.jpg" alt="tobolsk.jpg with NCC pyramid alignment only" />
+          <figcaption>Before &mdash; NCC pyramid alignment only.</figcaption>
+        </figure>
+        <figure>
+          <img src="./Final/tobolsk-after.jpg" alt="tobolsk.jpg with the full pipeline applied" />
+          <figcaption>After &mdash; full pipeline.</figcaption>
+        </figure>
+      </div>
+
+      <p style="margin: 28px 0 6px;"><strong>wharf.tif</strong></p>
+      <div class="pair">
+        <figure>
+          <img src="./Final/wharf-before.jpg" alt="wharf.tif with NCC pyramid alignment only" />
+          <figcaption>Before &mdash; NCC pyramid alignment only.</figcaption>
+        </figure>
+        <figure>
+          <img src="./Final/wharf-after.jpg" alt="wharf.tif with the full pipeline applied" />
+          <figcaption>After &mdash; full pipeline.</figcaption>
+        </figure>
+      </div>
+    </section>
   </main>
 
   <footer class="site-footer">
@@ -372,5 +596,6 @@
     </div>
   </footer>
   <script>document.getElementById("yr").textContent = new Date().getFullYear();</script>
+  <script src="../../assets/lightbox.js"></script>
 </body>
 </html>
