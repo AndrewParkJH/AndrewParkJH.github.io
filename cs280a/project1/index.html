@@ -1,0 +1,376 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Project 1 &mdash; CS280A &mdash; Andrew Park</title>
+  <link rel="stylesheet" href="../../assets/style.css" />
+</head>
+<body>
+  <header class="site-header">
+    <div class="site-header__inner">
+      <a class="brand" href="../../index.html">Andrew <span>Park</span></a>
+      <nav class="nav">
+        <a href="../../index.html">Home</a>
+        <a href="../index.html" class="is-active">CS280A</a>
+      </nav>
+    </div>
+  </header>
+
+  <main>
+    <a class="back-link" href="../index.html">&larr; CS280A</a>
+
+    <p class="eyebrow">CS280A &middot; Project 1</p>
+    <h1 class="page-title">Colorizing the Prokudin-Gorskii Photo Collection</h1>
+    <p class="lede">
+      Sergei Prokudin-Gorskii photographed the Russian Empire around 1907&ndash;1915
+      by exposing three black-and-white glass plates of the same scene through
+      red, green, and blue filters. We reconstruct color by finding the right alignment between
+      the three plates, as the camera and subject shifted slightly between exposures.
+    </p>
+
+    <!-- ---------- Part 1 ---------- -->
+    <section class="part" id="part1">
+      <p class="part__label">Part 1</p>
+      <h2 class="part__title">Single-Scale Alignment</h2>
+      <p>
+        The three low-resolution scans (<code>cathedral.jpg</code>,
+        <code>monastery.jpg</code>, <code>tobolsk.jpg</code>) are small enough
+        to brute-force. We hold the blue channel fixed and exhaustively search
+        every integer displacement <code>(dx, dy)</code> of the green and red
+        channels in a &plusmn;15 pixel window, scoring each candidate against a
+        cropped, border-free center region. Two scoring metrics were compared
+        &mdash; L2 / sum-of-squared-differences (minimize distance) and
+        normalized cross-correlation (maximize similarity) or NCC &mdash; and for all
+        three images they converge on the same displacement. 
+      </p>
+      <p style="margin-bottom: 6px;"><strong>cathedral.jpg</strong></p>
+      <div class="pair">
+        <figure>
+          <img src="./Part1/cathedral-l2.jpg" alt="cathedral.jpg aligned via exhaustive naive search with the L2 metric" />
+          <figcaption>Image: cathedral.jpg<br>Metric: L2<br>Displacement: G (2, 5), R (3, 12)</figcaption>
+        </figure>
+        <figure>
+          <img src="./Part1/cathedral-ncc.jpg" alt="cathedral.jpg aligned via exhaustive naive search with the NCC metric" />
+          <figcaption>Image: cathedral.jpg<br>Metric: NCC<br>Displacement: G (2, 5), R (3, 12)</figcaption>
+        </figure>
+      </div>
+
+      <p style="margin: 28px 0 6px;"><strong>monastery.jpg</strong></p>
+      <div class="pair">
+        <figure>
+          <img src="./Part1/monastery-l2.jpg" alt="monastery.jpg aligned via exhaustive naive search with the L2 metric" />
+          <figcaption>Image: monastery.jpg<br>Metric: L2<br>Displacement: G (2, &minus;3), R (2, 3)</figcaption>
+        </figure>
+        <figure>
+          <img src="./Part1/monastery-ncc.jpg" alt="monastery.jpg aligned via exhaustive naive search with the NCC metric" />
+          <figcaption>Image: monastery.jpg<br>Metric: NCC<br>Displacement: G (2, &minus;3), R (2, 3)</figcaption>
+        </figure>
+      </div>
+
+      <p style="margin: 28px 0 6px;"><strong>tobolsk.jpg</strong></p>
+      <div class="pair">
+        <figure>
+          <img src="./Part1/tobolsk-l2.jpg" alt="tobolsk.jpg aligned via exhaustive naive search with the L2 metric" />
+          <figcaption>Image: tobolsk.jpg<br>Metric: L2<br>Displacement: G (3, 3), R (3, 6)</figcaption>
+        </figure>
+        <figure>
+          <img src="./Part1/tobolsk-ncc.jpg" alt="tobolsk.jpg aligned via exhaustive naive search with the NCC metric" />
+          <figcaption>Image: tobolsk.jpg<br>Metric: NCC<br>Displacement: G (3, 3), R (3, 6)</figcaption>
+        </figure>
+      </div>
+    </section>
+
+    <!-- ---------- Part 2 ---------- -->
+    <section class="part" id="part2">
+      <p class="part__label">Part 2</p>
+      <h2 class="part__title">Multi-Scale Pyramid Alignment (with NCC)</h2>
+      <p>
+        The full-resolution glass plate scans are far too large for an
+        exhaustive &plusmn;15&nbsp;px search &mdash; and the true displacement can
+        exceed that window anyway. Instead I build an image pyramid by
+        repeatedly halving each channel (box-filter averaging), align at the
+        coarsest level with a wide search window, then propagate that
+        estimate down the pyramid &mdash; doubling it and refining with a small
+        local search at each finer scale &mdash; until I'm back at full
+        resolution. All alignment is scored with normalized cross-correlation.
+      </p>
+      <div class="frames">
+        <figure>
+          <img src="./Part2/church.jpg" alt="church.tif aligned with multi-scale NCC pyramid alignment" />
+          <figcaption>Image: church.tif<br>Metric: NCC<br>Displacement: G (4, 25), R (&minus;4, 58)</figcaption>
+        </figure>
+        <figure>
+          <img src="./Part2/harvesters.jpg" alt="harvesters.tif aligned with multi-scale NCC pyramid alignment" />
+          <figcaption>Image: harvesters.tif<br>Metric: NCC<br>Displacement: G (17, 60), R (13, 124)</figcaption>
+        </figure>
+        <figure>
+          <img src="./Part2/icon.jpg" alt="icon.tif aligned with multi-scale NCC pyramid alignment" />
+          <figcaption>Image: icon.tif<br>Metric: NCC<br>Displacement: G (17, 41), R (23, 89)</figcaption>
+        </figure>
+        <figure>
+          <img src="./Part2/ilemselga.jpg" alt="ilemselga.tif aligned with multi-scale NCC pyramid alignment" />
+          <figcaption>Image: ilemselga.tif<br>Metric: NCC<br>Displacement: G (7, 40), R (11, 130)</figcaption>
+        </figure>
+        <figure>
+          <img src="./Part2/melons.jpg" alt="melons.tif aligned with multi-scale NCC pyramid alignment" />
+          <figcaption>Image: melons.tif<br>Metric: NCC<br>Displacement: G (11, 82), R (13, 178)</figcaption>
+        </figure>
+        <figure>
+          <img src="./Part2/religous_painting.jpg" alt="religous_painting.tif aligned with multi-scale NCC pyramid alignment" />
+          <figcaption>Image: religous_painting.tif<br>Metric: NCC<br>Displacement: G (3, 28), R (7, 68)</figcaption>
+        </figure>
+        <figure>
+          <img src="./Part2/self_portrait.jpg" alt="self_portrait.tif aligned with multi-scale NCC pyramid alignment" />
+          <figcaption>Image: self_portrait.tif<br>Metric: NCC<br>Displacement: G (29, 79), R (37, 176)</figcaption>
+        </figure>
+        <figure>
+          <img src="./Part2/siren.jpg" alt="siren.tif aligned with multi-scale NCC pyramid alignment" />
+          <figcaption>Image: siren.tif<br>Metric: NCC<br>Displacement: G (&minus;6, 49), R (&minus;25, 96)</figcaption>
+        </figure>
+        <figure>
+          <img src="./Part2/three_generations.jpg" alt="three_generations.tif aligned with multi-scale NCC pyramid alignment" />
+          <figcaption>Image: three_generations.tif<br>Metric: NCC<br>Displacement: G (14, 53), R (11, 112)</figcaption>
+        </figure>
+        <figure>
+          <img src="./Part2/wharf.jpg" alt="wharf.tif aligned with multi-scale NCC pyramid alignment" />
+          <figcaption>Image: wharf.tif<br>Metric: NCC<br>Displacement: G (&minus;7, 15), R (&minus;16, 83)</figcaption>
+        </figure>
+      </div>
+
+      <div class="placeholder" style="max-width: none;">
+        <span class="placeholder__tag">Special case &mdash; emir.tif</span>
+        <p>
+          Plain-intensity NCC pyramid alignment fails on <code>emir.tif</code>:
+          it converges on R (&minus;205, 141), a wild outlier next to every
+          other image's offsets, producing a clearly ghosted double image.
+          <strong>Note:</strong> I fixed this by aligning on image gradients
+          instead of raw pixel intensity &mdash; i.e. computing the score on
+          each channel's gradient magnitude map rather than its intensity
+          values &mdash; which is far less sensitive to the flat, saturated
+          fabric colors in this scene that were confusing intensity-based NCC.
+        </p>
+        <div class="pair">
+          <figure>
+            <img src="./Part2/emir-ncc.jpg" alt="emir.tif with a failed NCC pyramid alignment on raw intensity, showing a strong red-channel ghost offset to the left" />
+            <figcaption>Image: emir.tif<br>Metric: NCC (intensity)<br>Displacement: G (24, 49), R (&minus;205, 141)</figcaption>
+          </figure>
+          <figure>
+            <img src="./Part2/emir-gradient.jpg" alt="emir.tif aligned by scoring image gradients instead of raw intensity, producing a clean composite" />
+            <figcaption>Image: emir.tif<br>Metric: NCC (gradient)<br>Displacement: G (40, 107), R (24, 49)</figcaption>
+          </figure>
+        </div>
+      </div>
+
+      <p style="margin-top: 40px;"><span class="placeholder__tag">My own images</span></p>
+      <p>
+        Three of my own Prokudin-Gorskii plates from the Library of Congress
+        collection, run through the same NCC pyramid pipeline, shown next to
+        the archive's own reference scan of each photo.
+      </p>
+
+      <p style="margin-bottom: 6px;"><strong>My own 1</strong></p>
+      <div class="pair">
+        <figure>
+          <img src="./Part2/myown1-ref.jpg" alt="Library of Congress reference scan of a woman seated on a balcony" />
+          <figcaption>Reference &mdash; Library of Congress archive scan.</figcaption>
+        </figure>
+        <figure>
+          <img src="./Part2/myown1-mine.jpg" alt="My own NCC pyramid alignment of the same balcony photo" />
+          <figcaption>Image: Mine<br>Metric: NCC<br>Displacement: G (21, 38), R (35, 76)</figcaption>
+        </figure>
+      </div>
+
+      <p style="margin: 28px 0 6px;"><strong>My own 2</strong></p>
+      <div class="pair">
+        <figure>
+          <img src="./Part2/myown2-ref.jpg" alt="Library of Congress reference scan of a lakeside mountain town" />
+          <figcaption>Reference &mdash; Library of Congress archive scan.</figcaption>
+        </figure>
+        <figure>
+          <img src="./Part2/myown2-mine.jpg" alt="My own NCC pyramid alignment of the same lakeside town photo" />
+          <figcaption>Image: Mine<br>Metric: NCC<br>Displacement: G (8, 55), R (32, 121)</figcaption>
+        </figure>
+      </div>
+
+      <p style="margin: 28px 0 6px;"><strong>My own 3</strong></p>
+      <div class="pair">
+        <figure>
+          <img src="./Part2/myown3-ref.jpg" alt="Library of Congress reference scan of a hillside building with domed towers" />
+          <figcaption>Reference &mdash; Library of Congress archive scan.</figcaption>
+        </figure>
+        <figure>
+          <img src="./Part2/myown3-mine.jpg" alt="My own NCC pyramid alignment of the same hillside building photo" />
+          <figcaption>Image: Mine<br>Metric: NCC<br>Displacement: G (&minus;16, 33), R (&minus;25, 79)</figcaption>
+        </figure>
+      </div>
+    </section>
+
+    <!-- ---------- Part 3 ---------- -->
+    <section class="part" id="part3">
+      <p class="part__label">Part 3</p>
+      <h2 class="part__title">Bells &amp; Whistles</h2>
+      <p class="part__subtitle" style="margin-top: 0;">Automatic border cropping.</p>
+      <p>
+        The raw scans have a dark
+        plate border and colored fringing around the edges that I wanted cut
+        off automatically. I run a Sobel filter on each channel and sum it along rows and columns.
+      </p>
+      <p>
+        I take the <em>innermost</em> spike past that threshold, not the
+        tallest one, since the outer seams between plate bands are always
+        sharper than the inner seam against the actual photo. Then I intersect
+        the crop bounds across all three color channels, since each one sits
+        at a slightly different spot on the plate and has its own border.
+      </p>
+      <p>
+        I used two parameters, <code>cap=0.10, k=5.0</code>. <code>cap</code> is how far in from each edge the detector is allowed to look, and 
+        <code>k</code> is the threshold multiplier, <code>thr = k * np.median(edge_prof)</code>. So a column only counts as a border candidate if its gradient sum exceeds the k parameter. 
+        Some images with large inner variance such as siren, self_portrait, icon, still under-crops slightly. This algorithm fails if there are too much variance.
+      </p>
+      <figure>
+        <figcaption>Raw channel splits (left three columns) vs. automatically cropped channel splits (right three columns), for every image in the dataset.</figcaption>
+        <img src="./Part3/auto-crop-grid.jpg" alt="Grid comparing raw channel splits against automatically cropped channel splits for every image in the dataset" />
+      </figure>
+
+      <p class="part__subtitle">Automatic contrasting.</p>
+      <p>
+        Scanned plates rarely use the full intensity range. A plate might span
+        only 0.08 to 0.82, leaving the image flat and hazy. I rescale linearly
+        by subtracting the global minimum and dividing by the global range,
+        <em>I&prime;</em> = (<em>I</em> &minus; <em>I</em><sub>min</sub>) /
+        (<em>I</em><sub>max</sub> &minus; <em>I</em><sub>min</sub>), so the
+        darkest pixel becomes black and the brightest becomes white. I use a
+        single minimum and maximum across all three channels rather than
+        per-channel values, which preserves the ratios between channels so
+        only contrast changes and colours stay intact. Stretching each
+        channel independently would amplify a weak channel more than a strong
+        one and shift the colour balance. Because the true extremes are used,
+        no clipping is needed, though the method is sensitive to outliers,
+        since a single dust speck can set the maximum and neutralise the
+        stretch. A percentile-based variant would avoid that.
+      </p>
+      <div class="pair">
+        <figure>
+          <img src="./Part3/contrast-before.jpg" alt="emir.tif before automatic contrast stretching, looking flat and hazy" />
+          <figcaption>Before &mdash; raw aligned composite, intensities span roughly 0.08&ndash;0.82.</figcaption>
+        </figure>
+        <figure>
+          <img src="./Part3/contrast-after.jpg" alt="emir.tif after automatic contrast stretching, using the full intensity range" />
+          <figcaption>After &mdash; linearly rescaled to the full 0&ndash;1 range.</figcaption>
+        </figure>
+      </div>
+
+      <p class="part__subtitle">Automatic white balance.</p>
+      <p>
+        What a plate records is surface reflectance multiplied by the colour
+        of the light, so a white wall under warm light produces orange
+        pixels. White balancing estimates the illuminant and divides it out.
+        Estimating it is the hard part, since only the product is observable,
+        so I implemented the two standard heuristics. Gray world assumes the
+        average reflectance of a scene is neutral, making the per-channel
+        average the illuminant. White world assumes the brightest surface is
+        white, and I use the 99th percentile rather than the true maximum so
+        a single dust speck cannot set the estimate. Correction is then a
+        diagonal transform, scaling each channel by the ratio of the mean
+        illuminant to that channel's illuminant, which keeps overall
+        brightness fixed and changes only the ratios between channels. Since
+        gains above 1 push bright pixels past 1.0, I renormalise by the new
+        maximum rather than clipping, preserving relative values instead of
+        blowing out highlights. Both heuristics rest on assumptions that are
+        often false, and gray world in particular fails on scenes dominated
+        by one colour, such as dense foliage, where the average genuinely is
+        green and the method removes real colour rather than a cast.
+      </p>
+      <div class="pair">
+        <figure>
+          <img src="./Part3/wb-before.jpg" alt="emir.tif before automatic white balancing, with a warm orange cast" />
+          <figcaption>Before &mdash; contrast-adjusted composite, warm cast on the wall.</figcaption>
+        </figure>
+        <figure>
+          <img src="./Part3/wb-after.jpg" alt="emir.tif after automatic white balancing with the white-world heuristic, neutral wall tone" />
+          <figcaption>After &mdash; white-world balance (99th-percentile illuminant estimate).</figcaption>
+        </figure>
+      </div>
+
+      <p class="part__subtitle">Gradient-based alignment.</p>
+      <p>Aligned on gradient magnitude instead of raw intensity.</p>
+      <pre><code>def edge_map(im):
+    gx = sobel(im, axis=1)
+    gy = sobel(im, axis=0)
+    return np.sqrt(gx**2 + gy**2)</code></pre>
+      <p>
+        You compute the edge map of each channel, run the pyramid search on
+        those to get the displacement, then apply that displacement to the
+        original channels. The edge maps are scaffolding and get discarded.
+      </p>
+      <p>
+        The reason it helps is Emir. His robe is bright blue, so it reads
+        near white in the blue channel and near black in the red. Raw
+        intensity matching sees two very different images and picks a wrong
+        offset. But the outline of the robe, the door frame, and the folds
+        sit in identical places in every channel, because structure is
+        shared even when brightness is not.
+      </p>
+      <div class="pair">
+        <figure>
+          <img src="./Part3/feature-before.jpg" alt="emir.tif with a failed NCC pyramid alignment on raw intensity, showing a strong red-channel ghost offset to the left" />
+          <figcaption>Image: emir.tif<br>Metric: NCC (intensity)<br>Displacement: G (24, 49), R (&minus;205, 141)</figcaption>
+        </figure>
+        <figure>
+          <img src="./Part3/feature-after.jpg" alt="emir.tif aligned by matching gradient magnitude instead of raw intensity, producing a clean composite" />
+          <figcaption>Image: emir.tif<br>Metric: NCC (gradient)<br>Displacement: G (40, 107), R (24, 49)</figcaption>
+        </figure>
+      </div>
+
+      <p class="part__subtitle">Color mapping.</p>
+      <p>
+        Prokudin-Gorskii's filters were whatever glass and dyes were
+        available in 1907, with overlapping spectral transmission curves
+        that do not correspond to modern sRGB primaries, so each channel
+        carries some contamination from its neighbours even in a perfectly
+        aligned composite. The correction is a 3&times;3 matrix applied to
+        every pixel, where the diagonal does what white balance already does
+        and the off-diagonal terms undo the filter overlap. I used a
+        one-parameter model motivated by the physics, assuming each channel
+        picks up an equal share of its neighbours, giving a matrix whose rows
+        sum to 1 so neutral grays stay neutral. Positive values remove
+        cross-channel contamination and increase saturation, negative values
+        add it. I swept this parameter and selected by eye, then tuned each
+        channel separately since the overlap between blue and green is
+        physically not the same as between red and blue.
+      </p>
+      <p>
+        The final values I settled on were <code>(a_r, a_g, a_b) = (0.3, &minus;0.25, 0.1)</code>,
+        giving the matrix:
+      </p>
+      <pre><code>M = [[ 1.6 , -0.3 , -0.3 ],
+     [ 0.25,  0.5 ,  0.25],
+     [-0.1 , -0.1 ,  1.2 ]]</code></pre>
+
+     The after version is much better balanced in terms of green and red, where the original image was dominated by bright green.
+      <div class="pair">
+        <figure>
+          <img src="./Part3/colormap-before.jpg" alt="Aligned composite before color mapping, with a cyan-green cast over the grass and background" />
+          <figcaption>Before &mdash; aligned composite, cross-channel contamination visible as a cyan-green cast.</figcaption>
+        </figure>
+        <figure>
+          <img src="./Part3/colormap-after.jpg" alt="Composite after applying the 3x3 color mapping matrix, with more natural, saturated color" />
+          <figcaption>After &mdash; per-channel 3&times;3 color mapping, cast removed.</figcaption>
+        </figure>
+      </div>
+      <figure>
+        <figcaption>Sweeping <code>a_g</code> from &minus;0.30 to &minus;0.05: each step shifts how much green contamination is removed from the other two channels, changing color balance without touching alignment.</figcaption>
+        <img src="./Part3/colormap-sweep.jpg" alt="Grid showing the color-mapped composite at six different values of the a_g parameter, from -0.30 to -0.05" />
+      </figure>
+    </section>
+  </main>
+
+  <footer class="site-footer">
+    <div class="site-footer__inner">
+      &copy; <span id="yr"></span> Andrew Park &middot; CS280A, UC Berkeley
+    </div>
+  </footer>
+  <script>document.getElementById("yr").textContent = new Date().getFullYear();</script>
+</body>
+</html>
