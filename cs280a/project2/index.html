@@ -1,0 +1,720 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Project 2 &mdash; CS280A &mdash; Andrew Park</title>
+  <link rel="stylesheet" href="../../assets/style.css" />
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.css" />
+  <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.js"></script>
+  <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/contrib/auto-render.min.js"
+    onload="renderMathInElement(document.body,{delimiters:[{left:'$$',right:'$$',display:true},{left:'\\(',right:'\\)',display:false}],throwOnError:false});"></script>
+  <style>
+    /* ---------- page-scoped layout for the Project 2 report ---------- */
+    figure { margin-inline: auto; }
+
+    /* at-a-glance overview */
+    .glance-group { margin-top: 36px; }
+    .glance-group h2 {
+      font-size: 0.8rem; font-weight: 700; letter-spacing: 0.12em;
+      text-transform: uppercase; color: var(--muted); margin: 0 0 12px;
+    }
+    .glance {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(210px, 1fr));
+      gap: 14px;
+    }
+    .glance a {
+      display: block; background: var(--surface); border: 1px solid var(--line);
+      border-radius: 12px; padding: 14px 16px; color: var(--ink);
+      transition: transform .15s ease, box-shadow .15s ease, border-color .15s ease;
+    }
+    .glance a:hover {
+      text-decoration: none; transform: translateY(-2px);
+      box-shadow: 0 10px 24px rgba(31,35,40,.07); border-color: #d9d2c6;
+    }
+    .glance .num { font-size: .74rem; font-weight: 700; color: var(--accent); letter-spacing: .08em; }
+    .glance .ttl { display: block; font-weight: 650; margin: 2px 0 4px; }
+    .glance .sum { display: block; font-size: .86rem; color: var(--muted); line-height: 1.45; }
+
+    /* section header */
+    .group-banner {
+      margin-top: 80px; padding: 18px 22px; border-radius: var(--radius);
+      background: var(--accent-soft); display: flex; align-items: baseline;
+      gap: 14px; flex-wrap: wrap;
+    }
+    .group-banner strong { font-size: 1.25rem; letter-spacing: -.01em; }
+    .group-banner span { color: var(--muted); font-size: .95rem; }
+    .group-banner + .part { border-top: 0; margin-top: 28px; }
+
+    .takeaway {
+      border-left: 3px solid var(--accent); background: var(--surface);
+      border-radius: 0 10px 10px 0; padding: 12px 16px; margin: 0 0 8px;
+      font-size: .98rem;
+    }
+    .takeaway b { color: var(--accent); font-size: .75rem; letter-spacing: .1em;
+      text-transform: uppercase; display: block; margin-bottom: 2px; }
+
+    /* Method / Results / Discussion step headings */
+    .step {
+      display: flex; align-items: center; gap: 10px; margin: 36px 0 12px;
+      font-size: .78rem; font-weight: 700; letter-spacing: .12em;
+      text-transform: uppercase; color: var(--muted);
+    }
+    .step::after { content: ""; flex: 1; height: 1px; background: var(--line); }
+    .step + p { margin-top: 0; }
+
+    .sub { font-weight: 650; font-size: 1.02rem; margin: 28px 0 8px; }
+
+    /* equations */
+    .eqs { display: grid; gap: 10px; margin: 16px 0; }
+    .eqs.two { grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); }
+    .eq {
+      background: var(--surface); border: 1px solid var(--line); border-radius: 12px;
+      padding: 6px 16px 10px; overflow-x: auto;
+    }
+    .eq .katex-display { margin: .6em 0 .3em; }
+    .eq small { display: block; color: var(--muted); font-size: .8rem; text-align: center; }
+
+    /* parameter chips */
+    .params { display: flex; flex-wrap: wrap; gap: 8px; margin: 14px 0 4px; padding: 0; list-style: none; }
+    .params li {
+      font-size: .82rem; background: var(--surface); border: 1px solid var(--line);
+      border-radius: 999px; padding: 3px 12px; color: var(--muted);
+    }
+    .params li b { color: var(--ink); font-weight: 600; }
+
+    /* figure grids */
+    .g { display: grid; gap: 14px; margin: 16px 0; align-items: start; }
+    .g2 { grid-template-columns: repeat(2, 1fr); }
+    .g3 { grid-template-columns: repeat(3, 1fr); }
+    .g4 { grid-template-columns: repeat(4, 1fr); }
+    .g-2-1 { grid-template-columns: 2fr 1fr; }
+    .g-1-1 { grid-template-columns: 1fr 1fr; align-items: center; }
+    .g figure, .fig { border-radius: 10px; }
+    .fig { margin: 16px auto; }
+    .w70 { max-width: 70%; } .w60 { max-width: 60%; } .w50 { max-width: 50%; }
+    .code2 { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+    .code2 pre { max-width: none; margin: 6px 0 0; }
+    .code2 p { margin: 0; font-size: .85rem; font-weight: 600; }
+    .note { font-size: .9rem; color: var(--muted); }
+
+    /* hybrid cards */
+    .hybrid {
+      display: grid; grid-template-columns: 110px 1fr 90px; gap: 14px;
+      align-items: end; margin: 16px 0;
+    }
+    .hybrid .inputs { display: grid; gap: 10px; }
+    .hybrid-card {
+      border: 1px solid var(--line); border-radius: var(--radius);
+      padding: 14px 16px 4px; background: #fffdf9;
+    }
+    .hybrid-card h4 { margin: 0; font-size: .95rem; }
+    .hybrid-card h4 span { color: var(--accent); font-weight: 500; font-size: .9rem; }
+    .hybrid-cards { display: grid; grid-template-columns: 1fr; gap: 16px; }
+    .h-inputs { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; margin: 10px 0 16px; }
+    .h-inputs figure { margin: 0; }
+    .h-inputs img { aspect-ratio: 3 / 2; object-fit: cover; object-position: center; }
+    .h-out { display: flex; align-items: flex-end; gap: 16px; margin-bottom: 12px; }
+    .h-out figure { margin: 0; }
+    .h-out .close { flex: 0 1 520px; }
+    .h-out .far { flex: 0 0 100px; }
+    .h-label { font-size: .72rem; font-weight: 700; letter-spacing: .1em; text-transform: uppercase; color: var(--muted); margin: 0; }
+
+    .to-top { display: inline-block; margin-top: 28px; font-size: .85rem; }
+
+    @media (max-width: 760px) {
+      .g3, .g4 { grid-template-columns: repeat(2, 1fr); }
+      .g2, .g-2-1, .g-1-1, .code2, .hybrid-cards { grid-template-columns: 1fr; }
+      .w70, .w60, .w50 { max-width: 100%; }
+    }
+    @media (max-width: 460px) { .g3, .g4 { grid-template-columns: 1fr; } }
+  </style>
+</head>
+<body>
+  <header class="site-header">
+    <div class="site-header__inner">
+      <a class="brand" href="../../index.html">Andrew <span>Park</span></a>
+      <nav class="nav">
+        <a href="../../index.html">Home</a>
+        <a href="../index.html" class="is-active">CS280A</a>
+      </nav>
+    </div>
+  </header>
+
+  <main>
+    <a class="back-link" href="../index.html">&larr; CS280A</a>
+
+    <p class="eyebrow">CS280A &middot; Project 2</p>
+    <h1 class="page-title" id="top">Fun with Filters and Frequencies</h1>
+    <p class="lede">
+      Convolution from scratch, edge detection with finite differences and
+      derivative-of-Gaussian filters, then frequency-domain tricks:
+      sharpening, hybrid images, and multiresolution blending with Gaussian
+      and Laplacian stacks.
+    </p>
+
+    <!-- ================= at a glance ================= -->
+    <div class="glance-group">
+      <h2>Part 1 &middot; Filters</h2>
+      <div class="glance">
+        <a href="#part1-1"><span class="num">1.1</span><span class="ttl">Convolutions from Scratch</span><span class="sum">4-loop and 2-loop NumPy convolution; matches scipy to 1e-15.</span></a>
+        <a href="#part1-2"><span class="num">1.2</span><span class="ttl">Finite Difference Operator</span><span class="sum">Gradient magnitude + threshold; t = 0.25, but grass noise leaks in.</span></a>
+        <a href="#part1-3"><span class="num">1.3</span><span class="ttl">Derivative of Gaussian</span><span class="sum">Smooth first: cleaner edges, one DoG filter does both steps.</span></a>
+        <a href="#part1-4"><span class="num">1.4</span><span class="ttl">Gradient Orientation</span><span class="sum">Hue = edge direction, brightness = edge strength.</span></a>
+      </div>
+    </div>
+    <div class="glance-group">
+      <h2>Part 2 &middot; Frequencies</h2>
+      <div class="glance">
+        <a href="#part2-1"><span class="num">2.1</span><span class="ttl">Sharpening</span><span class="sum">Unsharp mask as a single kernel; &alpha; &asymp; 1&ndash;2 looks natural.</span></a>
+        <a href="#part2-2"><span class="num">2.2</span><span class="ttl">Hybrid Images</span><span class="sum">Low-pass A + high-pass B: different image at each distance.</span></a>
+        <a href="#part2-3"><span class="num">2.3</span><span class="ttl">Gaussian &amp; Laplacian Stacks</span><span class="sum">Split an image into frequency bands that sum back exactly.</span></a>
+        <a href="#part2-4"><span class="num">2.4</span><span class="ttl">Multiresolution Blending</span><span class="sum">Blend band by band with a blurred mask; no seams, no ghosts.</span></a>
+      </div>
+    </div>
+
+    <!-- ================================================================ -->
+    <div class="group-banner"><strong>Part 1 &middot; Fun with Filters</strong><span>Convolution, derivatives, and edges</span></div>
+
+    <!-- ---------- Part 1.1 ---------- -->
+    <section class="part" id="part1-1">
+      <p class="part__label">Part 1.1</p>
+      <h2 class="part__title">Convolutions from Scratch</h2>
+      <p class="takeaway"><b>Result</b>My convolution matches scipy; the 2-loop version is 6&times; faster than the 4-loop one, and scipy is ~50&times; faster still.</p>
+
+      <h3 class="step">Method</h3>
+      <p>
+        Convolution slides a flipped kernel <em>h</em> of size
+        \(K \times K\) (half-width \(k = \lfloor K/2 \rfloor\)) over the image
+        and takes a weighted sum at every pixel. I zero-pad the image by
+        <em>k</em> for <code>same</code> output (or by \(K-1\) for
+        <code>full</code>), flip the kernel in both axes, and then compute a
+        plain sliding dot product.
+      </p>
+      <div class="eqs two">
+        <div class="eq">$$ (f * h)[i,j] = \sum_{u=-k}^{k}\sum_{v=-k}^{k} h[u,v]\, f[i-u,\, j-v] $$<small>convolution (kernel flipped)</small></div>
+        <div class="eq">$$ \text{same: } H \times W \qquad \text{full: } (H+K-1)\times(W+K-1) $$<small>output size for an \(H \times W\) image</small></div>
+      </div>
+      <div class="code2">
+        <div>
+          <p>4-loop version</p>
+          <pre><code>def convolve_4loops(padded, kernel, output_shape):
+    out = np.zeros(output_shape)
+    for i in range(output_shape[0]):
+        for j in range(output_shape[1]):
+            for u in range(-kh, kh+1):
+                for v in range(-kw, kw+1):
+                    out[i, j] += kernel[u+kh, v+kw] \
+                        * padded[i+kh+u, j+kw+v]
+    return out</code></pre>
+        </div>
+        <div>
+          <p>2-loop version (inner loops vectorized)</p>
+          <pre><code>def convolve_2loops(padded, kernel, output_shape):
+    out = np.zeros(output_shape)
+    for i in range(output_shape[0]):
+        for j in range(output_shape[1]):
+            out[i, j] = np.sum(
+                padded[i:i+k1, j:j+k2] * kernel)
+    return out</code></pre>
+        </div>
+      </div>
+      <ul class="params">
+        <li>Box filter <b>9&times;9, all 1/81</b></li>
+        <li>D<sub>x</sub> <b>[&minus;1, 0, 1]</b></li>
+        <li>D<sub>y</sub> <b>[&minus;1, 0, 1]<sup>T</sup></b></li>
+        <li>Padding <b>zeros</b></li>
+        <li>Mode <b>same</b></li>
+      </ul>
+
+      <h3 class="step">Results</h3>
+      <p>
+        The box filter blurs the selfie. D<sub>x</sub> responds to
+        horizontal intensity changes (vertical edges) and D<sub>y</sub> to
+        vertical changes (horizontal edges). Derivative outputs are shown
+        with gray at 0.
+      </p>
+      <div class="g g4">
+        <figure><img src="./Part1/selfie_gray.jpg" alt="Grayscale version of the selfie image" /><figcaption>Grayscale input</figcaption></figure>
+        <figure><img src="./Part1/selfie_box9.jpg" alt="Selfie convolved with a 9x9 box filter, showing a blurred result" /><figcaption>9&times;9 box</figcaption></figure>
+        <figure><img src="./Part1/selfie_Dx.jpg" alt="Selfie convolved with the Dx finite difference operator, highlighting vertical edges" /><figcaption>D<sub>x</sub></figcaption></figure>
+        <figure><img src="./Part1/selfie_Dy.jpg" alt="Selfie convolved with the Dy finite difference operator, highlighting horizontal edges" /><figcaption>D<sub>y</sub></figcaption></figure>
+      </div>
+
+      <div class="g g2">
+        <div>
+          <p class="sub" style="margin-top:8px">Correctness vs <code>scipy.signal.convolve2d</code></p>
+          <div class="data-table-wrap" style="margin-top:8px">
+            <table class="data-table">
+              <thead><tr><th>Kernel</th><th>Shape</th><th>Match</th><th>Max |diff|</th></tr></thead>
+              <tbody>
+                <tr><td><code>box9</code></td><td>9&times;9</td><td>True</td><td>6.7e-16</td></tr>
+                <tr><td><code>Dx</code></td><td>1&times;3</td><td>True</td><td>0.0</td></tr>
+                <tr><td><code>Dy</code></td><td>3&times;1</td><td>True</td><td>0.0</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+        <div>
+          <p class="sub" style="margin-top:8px">Runtime (150&times;150 image, 9&times;9 kernel)</p>
+          <div class="data-table-wrap" style="margin-top:8px">
+            <table class="data-table">
+              <thead><tr><th>Method</th><th>Time</th><th>vs scipy</th></tr></thead>
+              <tbody>
+                <tr><td>4-loop</td><td>1.12&nbsp;s</td><td>310.6&times;</td></tr>
+                <tr><td>2-loop</td><td>0.18&nbsp;s</td><td>51.3&times;</td></tr>
+                <tr><td>scipy</td><td>0.0036&nbsp;s</td><td>1&times;</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
+      <figure class="fig w70">
+        <img src="./Part1/boundary_corner.png" alt="Corner of the box-filtered selfie showing progressive darkening from zero padding at the image boundary" />
+        <figcaption>Top-left corner after the 9&times;9 box: zero padding darkens the border; reflect padding does not.</figcaption>
+      </figure>
+
+      <h3 class="step">Discussion</h3>
+      <p>
+        The 6.7e-16 box-filter difference is floating-point rounding from
+        summing in a different order; D<sub>x</sub> and D<sub>y</sub> match
+        exactly because their weights are integers. Vectorizing the inner
+        loop gives a ~6&times; speedup, but scipy is still ~50&times; faster
+        because its whole loop runs in compiled code, while mine makes one
+        Python-level NumPy call per pixel. With zero padding the kernel
+        averages in black wherever it overlaps the border, so the outer 4
+        pixels (the half-width) darken toward the edge; scipy&rsquo;s
+        <code>boundary='fill'</code> does the same, and
+        <code>boundary='symm'</code> avoids it by mirroring the image.
+      </p>
+      <a class="to-top" href="#top">&uarr; Back to top</a>
+    </section>
+
+    <!-- ---------- Part 1.2 ---------- -->
+    <section class="part" id="part1-2">
+      <p class="part__label">Part 1.2</p>
+      <h2 class="part__title">Finite Difference Operator</h2>
+      <p class="takeaway"><b>Result</b>Finite differences find edges but also the grass texture; the best compromise threshold is t = 0.25.</p>
+
+      <h3 class="step">Method</h3>
+      <p>
+        I convolve the cameraman with D<sub>x</sub> and D<sub>y</sub>
+        (my Part 1.1 convolution), combine them into the gradient magnitude,
+        and mark pixels above a threshold <em>t</em> as edges.
+      </p>
+      <div class="eqs two">
+        <div class="eq">$$ g_x = f * D_x, \qquad g_y = f * D_y $$<small>partial derivatives</small></div>
+        <div class="eq">$$ \|\nabla f\| = \sqrt{g_x^2 + g_y^2}, \qquad E = \mathbb{1}\big[\|\nabla f\| > t\big] $$<small>gradient magnitude and binary edge map</small></div>
+      </div>
+      <ul class="params">
+        <li>Threshold <b>t = 0.25</b></li>
+        <li>Border crop <b>10 px</b> before thresholding</li>
+      </ul>
+
+      <h3 class="step">Results</h3>
+      <div class="g g3">
+        <figure><img src="./Part1/1_2_cameraman_Dx.png" alt="Cameraman image convolved with the Dx finite difference operator" /><figcaption>\(g_x\) (vertical edges)</figcaption></figure>
+        <figure><img src="./Part1/1_2_cameraman_Dy.png" alt="Cameraman image convolved with the Dy finite difference operator" /><figcaption>\(g_y\) (horizontal edges)</figcaption></figure>
+        <figure><img src="./Part1/1_2_cameraman_grad_mag.png" alt="Gradient magnitude of the cameraman image combining Dx and Dy" /><figcaption>\(\|\nabla f\|\)</figcaption></figure>
+      </div>
+      <div class="g g-2-1">
+        <figure><img src="./Part1/1_2_cameraman_thresholds.png" alt="Grid of binarized gradient magnitude images at six thresholds from 0.05 to 0.30" /><figcaption>Threshold sweep, t = 0.05&ndash;0.30</figcaption></figure>
+        <figure><img src="./Part1/1_2_cameraman_edges_t0_25.png" alt="Final binarized edge map of the cameraman image at threshold 0.25" /><figcaption>Chosen: t = 0.25</figcaption></figure>
+      </div>
+
+      <h3 class="step">Discussion</h3>
+      <p>
+        Below ~0.15 the grass and noise count as edges; at 0.20 speckle
+        remains; at 0.30 the coat outline and thin tripod legs break up.
+        t&nbsp;=&nbsp;0.25 keeps the subject&rsquo;s outline and removes most
+        grass, at the cost of weak background edges (buildings, horizon). The
+        10&nbsp;px crop removes the frame caused by zero padding and a thin
+        border in the source. No single threshold cleanly separates edges
+        from texture, because differencing amplifies high-frequency noise,
+        which motivates smoothing first in Part 1.3.
+      </p>
+      <a class="to-top" href="#top">&uarr; Back to top</a>
+    </section>
+
+    <!-- ---------- Part 1.3 ---------- -->
+    <section class="part" id="part1-3">
+      <p class="part__label">Part 1.3</p>
+      <h2 class="part__title">Derivative of Gaussian (DoG) Filter</h2>
+      <p class="takeaway"><b>Result</b>Smoothing before differentiating removes the grass noise, and blur-then-derivative equals one DoG convolution; t = 0.08.</p>
+
+      <h3 class="step">Method</h3>
+      <p>
+        The Gaussian is separable, so I build the 2D kernel as the outer
+        product of a 1D Gaussian (<code>cv2.getGaussianKernel</code>) with
+        itself, sized to cover about &plusmn;3&sigma;. Because convolution
+        is associative, blurring then differentiating is the same as
+        convolving once with a pre-combined derivative-of-Gaussian filter.
+      </p>
+      <div class="eqs two">
+        <div class="eq">$$ G(x,y) = \frac{1}{2\pi\sigma^2} e^{-\frac{x^2+y^2}{2\sigma^2}} = g(x)\,g(y) $$<small>separable Gaussian, size \(2\lceil 3\sigma\rceil + 1\)</small></div>
+        <div class="eq">$$ (f * G) * D_x = f * \underbrace{(G * D_x)}_{\text{DoG}_x} $$<small>associativity: two passes &rarr; one filter</small></div>
+      </div>
+      <ul class="params">
+        <li>&sigma; <b>2</b></li>
+        <li>Kernel <b>13&times;13</b></li>
+        <li>DoG built with <b>full</b> mode</li>
+        <li>Threshold <b>t = 0.08</b></li>
+      </ul>
+
+      <h3 class="step">Results</h3>
+      <div class="g g2">
+        <figure><img src="./Part1/1_3_DoG_filters.png" alt="Derivative-of-Gaussian filters shown as images, each with a negative and positive lobe" /><figcaption>DoG<sub>x</sub> and DoG<sub>y</sub>: a negative and a positive lobe</figcaption></figure>
+        <figure><img src="./Part1/1_3_blur_vs_dog.png" alt="Side-by-side comparison of gradient magnitude computed by blurring then differentiating versus a single derivative-of-Gaussian convolution" /><figcaption>Blur &rarr; D<sub>x,y</sub> (left) vs one DoG pass (right): identical</figcaption></figure>
+      </div>
+      <figure class="fig w70"><img src="./Part1/1_3_cameraman_thresholds.png" alt="Grid of binarized DoG gradient magnitude images at six thresholds from 0.02 to 0.12" /><figcaption>Threshold sweep with DoG, t = 0.02&ndash;0.12</figcaption></figure>
+      <div class="g g2" style="max-width: 640px; margin-inline: auto;">
+        <figure><img src="./Part1/1_2_cameraman_edges_t0_25.png" alt="Final edge map using finite differences at threshold 0.25" /><figcaption>1.2 finite difference, t = 0.25</figcaption></figure>
+        <figure><img src="./Part1/1_3_cameraman_edges_t0_08.png" alt="Final edge map using derivative-of-Gaussian at threshold 0.08" /><figcaption>1.3 DoG, t = 0.08</figcaption></figure>
+      </div>
+
+      <h3 class="step">Discussion</h3>
+      <p>
+        The two methods match in the interior; they differ only in a thin
+        border where the two-step method zero-pads twice (cropped for
+        display). Compared with 1.2, the grass texture is gone before
+        differentiating, so one threshold separates object edges from
+        background far better. Edges are thicker and smoother because each
+        step is spread over several pixels, and magnitudes are smaller, so
+        t&nbsp;=&nbsp;0.08 already isolates the subject. The trade-off: fine
+        detail disappears as &sigma; grows.
+      </p>
+      <a class="to-top" href="#top">&uarr; Back to top</a>
+    </section>
+
+    <!-- ---------- Part 1.4 ---------- -->
+    <section class="part" id="part1-4">
+      <p class="part__label">Part 1.4 &middot; Bells &amp; Whistles</p>
+      <h2 class="part__title">Gradient Orientation</h2>
+      <p class="takeaway"><b>Result</b>Hue encodes edge direction, brightness encodes edge strength.</p>
+
+      <h3 class="step">Method</h3>
+      <div class="eqs two">
+        <div class="eq">$$ \theta = \operatorname{atan2}\!\left(g_y,\, g_x\right) \in [-\pi, \pi] $$<small>orientation from the DoG outputs of 1.3</small></div>
+        <div class="eq">$$ (H, S, V) = \left(\tfrac{\theta + \pi}{2\pi},\; 1,\; \min\!\big(\tfrac{\|\nabla f\|}{p_{99}},\, 1\big)\right) $$<small>HSV mapping; \(p_{99}\) = 99th percentile of magnitude</small></div>
+      </div>
+
+      <h3 class="step">Results &amp; Discussion</h3>
+      <div class="g g-1-1">
+        <figure><img src="./Part1/1_4_gradient_orientation.png" alt="Gradient orientation of the cameraman visualized in HSV, hue for direction and brightness for magnitude" /><figcaption>Orientation as hue, magnitude as brightness (DoG, &sigma; = 2)</figcaption></figure>
+        <div>
+          <p>
+            Hue is cyclic, so &minus;180&deg; and 180&deg; get the same
+            color, matching the circular nature of angles.
+          </p>
+          <p>
+            Using magnitude as brightness darkens flat regions, where the
+            angle is meaningless noise, so only real edges are colored.
+          </p>
+          <p>
+            Opposite sides of thin structures such as the tripod legs show
+            complementary colors, because the gradient points in opposite
+            directions across a dark-on-light line.
+          </p>
+        </div>
+      </div>
+      <a class="to-top" href="#top">&uarr; Back to top</a>
+    </section>
+
+    <!-- ================================================================ -->
+    <div class="group-banner"><strong>Part 2 &middot; Fun with Frequencies</strong><span>Sharpening, hybrids, stacks, and blending</span></div>
+
+    <!-- ---------- Part 2.1 ---------- -->
+    <section class="part" id="part2-1">
+      <p class="part__label">Part 2.1</p>
+      <h2 class="part__title">Image &ldquo;Sharpening&rdquo;</h2>
+      <p class="takeaway"><b>Result</b>Unsharp masking boosts high frequencies in a single convolution; &alpha; &asymp; 1&ndash;2 looks natural, &alpha; = 5 creates halos, and it cannot recover detail lost to blur.</p>
+
+      <h3 class="step">Method</h3>
+      <p>
+        A Gaussian blur keeps the low frequencies, so the original minus the
+        blur is the high-frequency detail. Adding a scaled copy of that
+        detail back sharpens the image, and by linearity the whole operation
+        is one kernel (<em>e</em> = unit impulse). The kernel is a tall
+        positive spike in a shallow negative ring and sums to 1, so
+        brightness is preserved. Color images are filtered per RGB channel
+        and clipped to [0, 1].
+      </p>
+      <div class="eqs two">
+        <div class="eq">$$ f_{\text{sharp}} = f + \alpha\,\big(f - f * g\big) $$<small>add back the details</small></div>
+        <div class="eq">$$ f_{\text{sharp}} = f * \big((1+\alpha)\,e - \alpha\, g\big) $$<small>the same thing as one unsharp-mask filter</small></div>
+      </div>
+      <ul class="params">
+        <li>&sigma; <b>2</b> (13&times;13)</li>
+        <li>&alpha; sweep <b>0 &ndash; 5</b></li>
+        <li>Default <b>&alpha; = 2</b></li>
+      </ul>
+
+      <h3 class="step">Results</h3>
+      <figure class="fig"><img src="./Part2/2_1_taj_steps.jpg" alt="Unsharp masking pipeline on the Taj Mahal: original, blurred, high-frequency details, and sharpened result" /><figcaption>Pipeline on the Taj Mahal: original &rarr; blur &rarr; details &rarr; sharpened (&alpha; = 2)</figcaption></figure>
+      <figure class="fig w70"><img src="./Part2/2_1_unsharp_kernel.png" alt="Unsharp mask kernel shown as an image alongside its middle-row intensity profile" /><figcaption>The single kernel \((1+\alpha)e - \alpha g\) and its middle-row profile</figcaption></figure>
+
+      <p class="sub">Varying &alpha;</p>
+      <figure class="fig"><img src="./Part2/2_1_taj_alpha_sweep.jpg" alt="Taj Mahal sharpened at alpha 0, 0.5, 1, 2, and 5" /><figcaption>Taj Mahal</figcaption></figure>
+      <figure class="fig"><img src="./Part2/2_1_im2_alpha_sweep.jpg" alt="My own photo sharpened at alpha 0, 1, 2, and 5" /><figcaption>My image 1</figcaption></figure>
+      <figure class="fig"><img src="./Part2/2_1_im3_alpha_sweep.jpg" alt="A second photo of mine sharpened at alpha 0, 1, 2, and 5" /><figcaption>My image 2</figcaption></figure>
+
+      <p class="sub">Blur a sharp photo, then re-sharpen</p>
+      <figure class="fig w70"><img src="./Part2/2_1_blur_resharpen.jpg" alt="A sharp photo, its blurred version, and the re-sharpened result, with zoomed crops on the bottom row" /><figcaption>Original &rarr; blurred &rarr; re-sharpened (&alpha; = 2); bottom row zoomed in</figcaption></figure>
+
+      <h3 class="step">Discussion</h3>
+      <p>
+        &alpha; = 0 returns the original; &alpha; &asymp; 1&ndash;2 makes
+        edges and texture crisper while still looking natural. At
+        &alpha; = 5 the kernel overshoots on both sides of every edge,
+        producing bright and dark halos, and it amplifies noise and JPEG
+        artifacts, which are high-frequency too. Re-sharpening a blurred
+        photo restores edge contrast (eyes and face outline look crisp
+        again), but freckles and individual fur strands do not come back:
+        the blur suppressed those frequencies, and sharpening can only
+        amplify frequencies that are still there.
+      </p>
+      <a class="to-top" href="#top">&uarr; Back to top</a>
+    </section>
+
+    <!-- ---------- Part 2.2 ---------- -->
+    <section class="part" id="part2-2">
+      <p class="part__label">Part 2.2</p>
+      <h2 class="part__title">Hybrid Images</h2>
+      <p class="takeaway"><b>Result</b>Low frequencies of one image plus high frequencies of another: you see the high-pass image up close and the low-pass image from far away.</p>
+
+      <h3 class="step">Method</h3>
+      <p>
+        Our sensitivity to spatial frequency depends on viewing distance,
+        so high frequencies dominate up close and low frequencies from afar.
+        I align each pair on two clicked points (the eyes) with the provided
+        code, which scales, rotates, and crops to match. Then I low-pass
+        image A and high-pass image B (impulse minus Gaussian) and add them.
+        The image with more fine texture (fur, wrinkles, printed text) works
+        best as B.
+      </p>
+      <div class="eqs two">
+        <div class="eq">$$ H = A * G_{\sigma_{\text{low}}} \;+\; B * \big(e - G_{\sigma_{\text{high}}}\big) $$<small>hybrid image</small></div>
+        <div class="eq">$$ \log\big|\mathcal{F}\{I\}\big| $$<small>log-magnitude spectrum used for the frequency analysis</small></div>
+      </div>
+      <p class="note">
+        &sigma; chosen by eye: &sigma;<sub>low</sub> just large enough that
+        A&rsquo;s fine detail disappears, &sigma;<sub>high</sub> small enough
+        that only B&rsquo;s edges and texture remain.
+      </p>
+
+      <h3 class="step">Results</h3>
+      <div class="hybrid-card">
+        <h4>Favorite: person + chimpanzee <span>&nbsp;&sigma;<sub>low</sub> = 7, &sigma;<sub>high</sub> = 2</span></h4>
+        <p class="h-label" style="margin-top:10px">Inputs</p>
+        <div class="h-inputs">
+          <figure><img src="./Part2/2_2_pair1_B.jpg" alt="Low-pass input: a person" /><figcaption>A (low-pass)</figcaption></figure>
+          <figure><img src="./Part2/2_2_pair1_A.jpg" alt="High-pass input: a chimpanzee" style="object-position: center 35%;" /><figcaption>B (high-pass)</figcaption></figure>
+        </div>
+        <p class="h-label">Hybrid</p>
+        <div class="h-out">
+          <figure class="close"><img src="./Part2/2_2_pair1_hybrid.png" alt="Person-chimpanzee hybrid at full size" /><figcaption>Up close</figcaption></figure>
+          <figure class="far"><img src="./Part2/2_2_pair1_hybrid_small.png" alt="Person-chimpanzee hybrid at 25% scale" /><figcaption>Far (25%)</figcaption></figure>
+        </div>
+      </div>
+      <figure class="fig"><img src="./Part2/2_2_pair1_process.png" alt="Aligned person and chimpanzee inputs, their filtered versions, and the hybrid" /><figcaption>Aligned inputs &rarr; filtered &rarr; hybrid</figcaption></figure>
+      <figure class="fig"><img src="./Part2/2_2_pair1_fft.jpg" alt="Log-magnitude Fourier transforms of the inputs, filtered images, and hybrid" /><figcaption>Log-magnitude Fourier transforms of the same five images</figcaption></figure>
+      <p>
+        The input spectra are brightest at the center (low frequencies) with
+        streaks from strong straight edges. Low-passed A keeps only the
+        center; high-passed B has its center removed. The hybrid&rsquo;s
+        spectrum is the union: A&rsquo;s energy near the center and
+        B&rsquo;s farther out, which is exactly why each image appears at a
+        different distance.
+      </p>
+
+      <p class="sub">More results</p>
+      <div class="hybrid-cards">
+        <div class="hybrid-card">
+          <h4>Moon + basketball <span>&nbsp;&sigma;<sub>low</sub> = 7, &sigma;<sub>high</sub> = 2</span></h4>
+          <p class="h-label" style="margin-top:10px">Inputs</p>
+          <div class="h-inputs">
+            <figure><img src="./Part2/2_2_pair2_B.jpg" alt="Low-pass input: the moon" /><figcaption>A (low-pass)</figcaption></figure>
+            <figure><img src="./Part2/2_2_pair2_A.jpg" alt="High-pass input: a basketball" /><figcaption>B (high-pass)</figcaption></figure>
+          </div>
+          <p class="h-label">Hybrid</p>
+          <div class="h-out">
+            <figure class="close"><img src="./Part2/2_2_pair2_hybrid.png" alt="Moon-basketball hybrid at full size" /><figcaption>Up close</figcaption></figure>
+            <figure class="far"><img src="./Part2/2_2_pair2_hybrid_small.png" alt="Moon-basketball hybrid at 25% scale" /><figcaption>Far (25%)</figcaption></figure>
+          </div>
+        </div>
+        <div class="hybrid-card">
+          <h4>Tower + fish <span>&nbsp;&sigma;<sub>low</sub> = 5, &sigma;<sub>high</sub> = 3 &middot; partial success</span></h4>
+          <p class="h-label" style="margin-top:10px">Inputs</p>
+          <div class="h-inputs">
+            <figure><img src="./Part2/2_2_pair3_A.jpg" alt="Low-pass input: a tower" style="object-position: center 40%;" /><figcaption>A (low-pass)</figcaption></figure>
+            <figure><img src="./Part2/2_2_pair3_B.jpg" alt="High-pass input: a fish" /><figcaption>B (high-pass)</figcaption></figure>
+          </div>
+          <p class="h-label">Hybrid</p>
+          <div class="h-out">
+            <figure class="close"><img src="./Part2/2_2_pair3_hybrid.jpg" alt="Tower-fish hybrid at full size" /><figcaption>Up close</figcaption></figure>
+            <figure class="far"><img src="./Part2/2_2_pair3_hybrid_small.png" alt="Tower-fish hybrid at 25% scale" /><figcaption>Far (25%)</figcaption></figure>
+          </div>
+        </div>
+      </div>
+      <p>
+        The moon and basketball share a circular outline, so the switch
+        between readings is seamless. The tower and fish do not share a
+        shape, so up close the fish reads as an overlay rather than a
+        transformation. It still disappears at small scale, but it shows
+        that matching outlines matter for a convincing hybrid.
+      </p>
+
+      <p class="sub">Bells &amp; Whistles: color</p>
+      <figure class="fig"><img src="./Part2/2_2_pair1_color_variants.jpg" alt="Hybrid with color in the low-pass image only, the high-pass image only, and both" /><figcaption>Color in low-pass only &middot; high-pass only &middot; both</figcaption></figure>
+
+      <h3 class="step">Discussion</h3>
+      <p>
+        Color works best in the low-pass image: color is mostly
+        low-frequency information (large smooth regions of hue), so it
+        reinforces the far-away reading without cluttering the close-up. In
+        the high-pass image it survives only as faint fringes along edges.
+        Color in both makes the two palettes compete and muddies the result.
+      </p>
+      <a class="to-top" href="#top">&uarr; Back to top</a>
+    </section>
+
+    <!-- ---------- Part 2.3 ---------- -->
+    <section class="part" id="part2-3">
+      <p class="part__label">Part 2.3</p>
+      <h2 class="part__title">Gaussian and Laplacian Stacks</h2>
+      <p class="takeaway"><b>Result</b>A Gaussian stack gives progressively blurrier copies; the Laplacian stack splits the image into frequency bands that sum back to the original exactly.</p>
+
+      <h3 class="step">Method</h3>
+      <p>
+        A stack is a pyramid without downsampling: every level stays full
+        resolution. Each Gaussian level blurs the previous one; each
+        Laplacian level stores what that blur removed, and the last
+        Gaussian level is kept as the base. The sum telescopes, so collapsing
+        the stack returns the original (verified numerically).
+      </p>
+      <div class="eqs two">
+        <div class="eq">$$ G_0 = I, \qquad G_{i+1} = G_i * g_\sigma $$<small>Gaussian stack</small></div>
+        <div class="eq">$$ L_i = G_i - G_{i+1}\;(i \lt N), \qquad L_N = G_N $$<small>Laplacian stack (band-pass levels + base)</small></div>
+      </div>
+      <div class="eqs">
+        <div class="eq">$$ \sum_{i=0}^{N} L_i = (G_0 - G_1) + (G_1 - G_2) + \dots + G_N = G_0 = I $$<small>perfect reconstruction</small></div>
+      </div>
+      <h3 class="step">Results</h3>
+      <p>
+        Each stack has 5 levels (0&ndash;4). Every level blurs the previous
+        one with a Gaussian of &sigma; = 5 (31&times;31 kernel), using
+        symmetric (mirrored) boundary handling so the edges do not darken.
+      </p>
+      <figure class="fig"><img src="./Part2/2_3_apple_stacks.jpg" alt="Gaussian stack of the apple on top and Laplacian stack below, levels 0 to 4" /><figcaption>Apple: Gaussian (top) and Laplacian (bottom) stacks</figcaption></figure>
+      <figure class="fig"><img src="./Part2/2_3_orange_stacks.jpg" alt="Gaussian stack of the orange on top and Laplacian stack below, levels 0 to 4" /><figcaption>Orange: Gaussian (top) and Laplacian (bottom) stacks</figcaption></figure>
+      <div class="g g-1-1" style="grid-template-columns: 3fr 2fr;">
+        <figure><img src="./Part2/2_3_szeliski_fig342.jpg" alt="Recreation of Szeliski Figure 3.42: masked apple, masked orange, and blend at Laplacian levels 0, 2, and 4, plus collapsed results" /><figcaption>Recreation of Szeliski Fig. 3.42: masked levels 0, 2, 4 and the collapsed results</figcaption></figure>
+        <div>
+          <figure><img src="./Part2/2_3_oraple.png" alt="Final blended oraple" /><figcaption>The oraple</figcaption></figure>
+          <p class="note" style="margin-top:14px">
+            Apple levels are weighted by a blurred step mask, orange levels by
+            one minus the mask, then summed. The mask is sharp at level 0 and
+            wide at level 4.
+          </p>
+        </div>
+      </div>
+
+      <h3 class="step">Discussion</h3>
+      <p>
+        Level 0 holds the finest texture, deeper levels hold coarser
+        structure, and the base holds overall color and brightness. Because I
+        re-blur with the same &sigma; each step, the effective blur grows only
+        as \(\sigma\sqrt{i}\), so the middle bands overlap and Laplacian levels
+        1&ndash;3 look similar; doubling &sigma; per level would separate the
+        bands more evenly. Laplacian levels are rescaled per level for
+        display because they are centered at zero.
+      </p>
+      <a class="to-top" href="#top">&uarr; Back to top</a>
+    </section>
+
+    <!-- ---------- Part 2.4 ---------- -->
+    <section class="part" id="part2-4">
+      <p class="part__label">Part 2.4</p>
+      <h2 class="part__title">Multiresolution Blending</h2>
+      <p class="takeaway"><b>Result</b>Blending each Laplacian band with a correspondingly blurred mask hides the seam without ghosting, for straight and irregular masks alike.</p>
+
+      <h3 class="step">Method</h3>
+      <p>
+        Following Burt &amp; Adelson, I build Laplacian stacks of both
+        images and a Gaussian stack of the mask with the same blur schedule,
+        blend each band with its own mask level, and collapse. Fine bands see
+        a sharp mask (texture switches abruptly, no ghosting); coarse bands
+        see a wide mask (color and brightness fade over a wide region, no
+        visible seam). All blends are per RGB channel and work for any mask
+        shape.
+      </p>
+      <div class="eqs two">
+        <div class="eq">$$ L^{C}_k = M_k\, L^{A}_k + (1 - M_k)\, L^{B}_k $$<small>per-level blend, \(M_k\) = level <em>k</em> of the mask&rsquo;s Gaussian stack</small></div>
+        <div class="eq">$$ I_{\text{blend}} = \sum_{k=0}^{N} L^{C}_k $$<small>collapse the blended stack</small></div>
+      </div>
+      <ul class="params">
+        <li>&sigma; <b>5</b></li>
+        <li>Levels <b>5</b></li>
+        <li>Masks <b>vertical step, oval, half-oval</b></li>
+      </ul>
+
+      <h3 class="step">Results</h3>
+      <p class="sub">Straight seam</p>
+      <figure class="fig"><img src="./Part2/2_4_pair2_overview.jpg" alt="Michael and zombie inputs, the vertical mask (white marks Michael), and the blend" /><figcaption>Michael (A), zombie (B), mask (white = Michael), blend</figcaption></figure>
+      <div class="g g2" style="max-width: 620px; margin-inline: auto;">
+        <figure><img src="./Part2/2_3_oraple.png" alt="The oraple, a vertical-seam blend of apple and orange" /><figcaption>Oraple</figcaption></figure>
+        <figure><img src="./Part2/2_4_pair2_blend.jpg" alt="Michael and zombie blended down a straight vertical seam" /><figcaption>Michael / zombie</figcaption></figure>
+      </div>
+
+      <p class="sub">Irregular masks</p>
+      <div class="g g4">
+        <figure><img src="./Part2/2_4_pair1_A_crop.png" alt="Cropped cat image" /><figcaption>A: cat</figcaption></figure>
+        <figure><img src="./Part2/2_4_pair1_B_crop.png" alt="Cropped volleyball image" /><figcaption>B: volleyball</figcaption></figure>
+        <figure><img src="./Part2/2_4_pair1_mask.png" alt="Oval mask around the cat's face" /><figcaption>Oval mask</figcaption></figure>
+        <figure><img src="./Part2/2_4_pair1_blend.png" alt="Cat's face blended onto the volleyball" /><figcaption>Blend</figcaption></figure>
+      </div>
+      <div class="g g-1-1" style="grid-template-columns: 1fr 1fr 1.25fr;">
+        <figure><img src="./Part2/2_4_pair2_halfface_mask.png" alt="Half-oval mask over the right half of the face" /><figcaption>Half-oval mask (white = zombie)</figcaption></figure>
+        <figure><img src="./Part2/2_4_pair2_halfface_blend.jpg" alt="Half of the zombie's face blended onto Michael" /><figcaption>Half-face blend</figcaption></figure>
+        <figure><img src="./Part2/2_4_pair2_halfface_fig342.jpg" alt="Masked Laplacian levels 0, 2, and 4 of the zombie and Michael, their sums, and the collapsed blend" /><figcaption>Masked levels 0, 2, 4 and collapse</figcaption></figure>
+      </div>
+
+      <p class="sub">Bells &amp; Whistles: color transfer</p>
+      <p>
+        The zombie has a strong blue cast, so before blending I match its
+        color statistics to Michael&rsquo;s in Lab space (Reinhard color
+        transfer), applied at 70% strength. Lab separates lightness from
+        color, so this warms the zombie without changing its detail.
+      </p>
+      <div class="eqs two">
+        <div class="eq">$$ c' = \frac{\sigma_{\text{t}}}{\sigma_{\text{s}}}\big(c - \mu_{\text{s}}\big) + \mu_{\text{t}}, \quad c \in \{L, a, b\} $$<small>match each channel&rsquo;s mean and std (s = zombie, t = Michael)</small></div>
+        <div class="eq">$$ c_{\text{out}} = c + 0.7\,(c' - c) $$<small>partial-strength transfer</small></div>
+      </div>
+      <figure class="fig"><img src="./Part2/2_4_pair3_color_transfer.jpg" alt="Zombie before and after Lab color transfer, and blends with original versus color-matched colors" /><figcaption>Zombie before/after color transfer; blend with original vs matched colors</figcaption></figure>
+
+      <h3 class="step">Discussion</h3>
+      <p>
+        On the straight seam, the very different backgrounds (brown vs.
+        blue) fade across a wide band thanks to the heavily blurred coarse
+        mask levels. In the level visualization, level 0 meets at a sharp
+        edge so texture does not mix, while level 4 fades the zombie&rsquo;s
+        colors gradually into Michael&rsquo;s. Blending removes seams in
+        edges and texture, but not a global color mismatch; color transfer
+        fixes that, and the result reads as one face with a zombie half
+        rather than two pasted images.
+      </p>
+      <a class="to-top" href="#top">&uarr; Back to top</a>
+    </section>
+  </main>
+
+  <footer class="site-footer">
+    <div class="site-footer__inner">
+      &copy; <span id="yr"></span> Andrew Park &middot; CS280A, UC Berkeley
+    </div>
+  </footer>
+  <script>document.getElementById("yr").textContent = new Date().getFullYear();</script>
+  <script src="../../assets/lightbox.js"></script>
+</body>
+</html>
