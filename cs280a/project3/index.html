@@ -1,0 +1,636 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Project 3 &mdash; CS280A &mdash; Andrew Park</title>
+  <link rel="stylesheet" href="../../assets/style.css" />
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.css" />
+  <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.js"></script>
+  <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/contrib/auto-render.min.js"
+    onload="renderMathInElement(document.body,{delimiters:[{left:'$$',right:'$$',display:true},{left:'\\(',right:'\\)',display:false}],throwOnError:false});"></script>
+  <style>
+    /* ---------- page-scoped layout for the Project 3 report ---------- */
+    figure { margin-inline: auto; }
+
+    /* at-a-glance overview */
+    .glance-group { margin-top: 36px; }
+    .glance-group h2 {
+      font-size: 0.8rem; font-weight: 700; letter-spacing: 0.12em;
+      text-transform: uppercase; color: var(--muted); margin: 0 0 12px;
+    }
+    .glance {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(210px, 1fr));
+      gap: 14px;
+    }
+    .glance a {
+      display: block; background: var(--surface); border: 1px solid var(--line);
+      border-radius: 12px; padding: 14px 16px; color: var(--ink);
+      transition: transform .15s ease, box-shadow .15s ease, border-color .15s ease;
+    }
+    .glance a:hover {
+      text-decoration: none; transform: translateY(-2px);
+      box-shadow: 0 10px 24px rgba(31,35,40,.07); border-color: #d9d2c6;
+    }
+    .glance .num { font-size: .74rem; font-weight: 700; color: var(--accent); letter-spacing: .08em; }
+    .glance .ttl { display: block; font-weight: 650; margin: 2px 0 4px; }
+    .glance .sum { display: block; font-size: .86rem; color: var(--muted); line-height: 1.45; }
+
+    /* section header */
+    .group-banner {
+      margin-top: 80px; padding: 18px 22px; border-radius: var(--radius);
+      background: var(--accent-soft); display: flex; align-items: baseline;
+      gap: 14px; flex-wrap: wrap;
+    }
+    .group-banner strong { font-size: 1.25rem; letter-spacing: -.01em; }
+    .group-banner span { color: var(--muted); font-size: .95rem; }
+    .group-banner + .part { border-top: 0; margin-top: 28px; }
+
+    .takeaway {
+      border-left: 3px solid var(--accent); background: var(--surface);
+      border-radius: 0 10px 10px 0; padding: 12px 16px; margin: 0 0 8px;
+      font-size: .98rem;
+    }
+    .takeaway b { color: var(--accent); font-size: .75rem; letter-spacing: .1em;
+      text-transform: uppercase; display: block; margin-bottom: 2px; }
+
+    /* Method / Results / Discussion step headings */
+    .step {
+      display: flex; align-items: center; gap: 10px; margin: 36px 0 12px;
+      font-size: .78rem; font-weight: 700; letter-spacing: .12em;
+      text-transform: uppercase; color: var(--muted);
+    }
+    .step::after { content: ""; flex: 1; height: 1px; background: var(--line); }
+    .step + p { margin-top: 0; }
+
+    .sub { font-weight: 650; font-size: 1.02rem; margin: 28px 0 8px; }
+
+    /* equations */
+    .eqs { display: grid; gap: 10px; margin: 16px 0; }
+    .eqs.two { grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); }
+    .eq {
+      background: var(--surface); border: 1px solid var(--line); border-radius: 12px;
+      padding: 6px 16px 10px; overflow-x: auto;
+    }
+    .eq .katex-display { margin: .6em 0 .3em; }
+    .eq small { display: block; color: var(--muted); font-size: .8rem; text-align: center; }
+
+    /* parameter chips */
+    .params { display: flex; flex-wrap: wrap; gap: 8px; margin: 14px 0 4px; padding: 0; list-style: none; }
+    .params li {
+      font-size: .82rem; background: var(--surface); border: 1px solid var(--line);
+      border-radius: 999px; padding: 3px 12px; color: var(--muted);
+    }
+    .params li b { color: var(--ink); font-weight: 600; }
+
+    /* figure grids */
+    .g { display: grid; gap: 14px; margin: 16px 0; align-items: start; }
+    .g2 { grid-template-columns: repeat(2, 1fr); }
+    .g3 { grid-template-columns: repeat(3, 1fr); }
+    .g4 { grid-template-columns: repeat(4, 1fr); }
+    .g-2-1 { grid-template-columns: 2fr 1fr; }
+    .g-1-1 { grid-template-columns: 1fr 1fr; align-items: center; }
+    .g figure, .fig { border-radius: 10px; }
+    .fig { margin: 16px auto; }
+    .w70 { max-width: 70%; } .w60 { max-width: 60%; } .w50 { max-width: 50%; }
+    .code2 { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+    .code2 pre { max-width: none; margin: 6px 0 0; }
+    .code2 p { margin: 0; font-size: .85rem; font-weight: 600; }
+    .note { font-size: .9rem; color: var(--muted); }
+
+    /* hybrid cards */
+    .hybrid {
+      display: grid; grid-template-columns: 110px 1fr 90px; gap: 14px;
+      align-items: end; margin: 16px 0;
+    }
+    .hybrid .inputs { display: grid; gap: 10px; }
+    .hybrid-card {
+      border: 1px solid var(--line); border-radius: var(--radius);
+      padding: 14px 16px 4px; background: #fffdf9;
+    }
+    .hybrid-card h4 { margin: 0; font-size: .95rem; }
+    .hybrid-card h4 span { color: var(--accent); font-weight: 500; font-size: .9rem; }
+    .hybrid-cards { display: grid; grid-template-columns: 1fr; gap: 16px; }
+    .h-inputs { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; margin: 10px 0 16px; }
+    .h-inputs figure { margin: 0; }
+    .h-inputs img { aspect-ratio: 3 / 2; object-fit: cover; object-position: center; }
+    .h-out { display: flex; align-items: flex-end; gap: 16px; margin-bottom: 12px; }
+    .h-out figure { margin: 0; }
+    .h-out .close { flex: 0 1 520px; }
+    .h-out .far { flex: 0 0 100px; }
+    .h-label { font-size: .72rem; font-weight: 700; letter-spacing: .1em; text-transform: uppercase; color: var(--muted); margin: 0; }
+
+    .to-top { display: inline-block; margin-top: 28px; font-size: .85rem; }
+
+    @media (max-width: 760px) {
+      .g3, .g4 { grid-template-columns: repeat(2, 1fr); }
+      .g2, .g-2-1, .g-1-1, .code2, .hybrid-cards { grid-template-columns: 1fr; }
+      .w70, .w60, .w50 { max-width: 100%; }
+    }
+    @media (max-width: 460px) { .g3, .g4 { grid-template-columns: 1fr; } }
+
+    .panel { margin: 16px auto; }
+    .far-view { display: flex; align-items: flex-end; gap: 16px; margin: 16px 0; }
+    .far-view figure { margin: 0; }
+    .far-view .close { flex: 0 1 420px; }
+    .far-view .far { flex: 0 0 72px; }
+    .prompt { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: .86rem; color: var(--ink); }
+    .lede { max-width: none; }
+    .part h4 { font-size: 1.02rem; margin: 28px 0 8px; }
+    .lede { max-width: none; }
+    .part h4 { font-size: 1.02rem; margin: 28px 0 8px; }
+    .lede { max-width: none; }
+    .part-heading { margin: 72px 0 0; padding-top: 28px; border-top: 2px solid var(--ink); font-size: 1.6rem; letter-spacing: -.01em; }
+    .part h4 { font-size: 1.02rem; margin: 28px 0 8px; }
+  </style>
+</head>
+<body>
+  <header class="site-header">
+    <div class="site-header__inner">
+      <a class="brand" href="../../index.html">Andrew <span>Park</span></a>
+      <nav class="nav">
+        <a href="../../index.html">Home</a>
+        <a href="../index.html" class="is-active">CS280A</a>
+      </nav>
+    </div>
+  </header>
+
+  <main>
+    <a class="back-link" href="../index.html">&larr; CS280A</a>
+
+    <p class="eyebrow">CS280A &middot; Project 3</p>
+    <h1 class="page-title" id="top">The Power of Flow Models</h1>
+    <p class="lede">
+      In Part A, we use a pretrained text-to-image flow model to study flow
+      matching: forward noising, one-step and iterative denoising,
+      classifier-free guidance, and applications to image editing, visual
+      anagrams, and hybrid images. In <a href="#partb">Part B</a>, we train
+      a UNet on MNIST from scratch, first as a single-step denoiser and then
+      as a flow matching model with time and class conditioning.
+    </p>
+
+    <div class="glance-group">
+      <h2>Part A</h2>
+      <div class="glance">
+        <a href="#a1-1"><span class="num">1.1</span><span class="ttl">Noisy Training Inputs</span></a>
+        <a href="#a1-2"><span class="num">1.2</span><span class="ttl">Classical Denoising</span></a>
+        <a href="#a1-3"><span class="num">1.3</span><span class="ttl">One-Step Denoising</span></a>
+        <a href="#a1-4"><span class="num">1.4</span><span class="ttl">Visualizing Velocity</span></a>
+        <a href="#a1-5"><span class="num">1.5</span><span class="ttl">Euler Sampling</span></a>
+        <a href="#a1-6"><span class="num">1.6</span><span class="ttl">Images from Noise</span></a>
+        <a href="#a2-1"><span class="num">2.1</span><span class="ttl">Classifier-Free Guidance</span></a>
+        <a href="#a3-1"><span class="num">3.1</span><span class="ttl">Image-to-Image Editing</span></a>
+        <a href="#a3-2"><span class="num">3.2</span><span class="ttl">Text-Guided Editing</span></a>
+        <a href="#a3-3"><span class="num">3.3</span><span class="ttl">Visual Anagrams</span></a>
+        <a href="#a3-4"><span class="num">3.4</span><span class="ttl">Hybrid Images</span></a>
+        <a href="#bw-anagrams"><span class="num">B&amp;W</span><span class="ttl">More Visual Anagrams</span></a>
+        <a href="#bw-logo"><span class="num">B&amp;W</span><span class="ttl">Course Logo</span></a>
+      </div>
+    </div>
+    <div class="glance-group">
+      <h2>Part B</h2>
+      <div class="glance">
+        <a href="#b1-2"><span class="num">1.2</span><span class="ttl">Noising Process</span></a>
+        <a href="#b1-2-1"><span class="num">1.2.1</span><span class="ttl">Training the Denoiser</span></a>
+        <a href="#b1-2-2"><span class="num">1.2.2</span><span class="ttl">Out-of-Distribution Testing</span></a>
+        <a href="#b1-2-3"><span class="num">1.2.3</span><span class="ttl">Denoising Pure Noise</span></a>
+        <a href="#b2-2"><span class="num">2.2</span><span class="ttl">Time-Conditioned UNet</span></a>
+        <a href="#b2-3"><span class="num">2.3</span><span class="ttl">Time-Conditioned Sampling</span></a>
+        <a href="#b2-5"><span class="num">2.5</span><span class="ttl">Class-Conditioned UNet</span></a>
+        <a href="#b2-6"><span class="num">2.6</span><span class="ttl">Class-Conditioned Sampling</span></a>
+        <a href="#b-bw"><span class="num">B&amp;W</span><span class="ttl">Better Time-Conditioned UNet</span></a>
+      </div>
+    </div>
+
+    <h2 class="part-heading" id="parta">Part A &middot; Exploring the Power of Flow Models</h2>
+
+    <section class="part" id="a1-1">
+      <p class="part__label">Part A &middot; 1.1</p>
+      <h2 class="part__title">Constructing Noisy Training Inputs</h2>
+      <p>
+        Flow matching trains on linear interpolations between Gaussian noise and clean images, indexed by a time \(t \in [0, 1]\). We use a single noise sample \(\epsilon\) for all three time steps, so only \(t\) changes.
+      </p>
+      <div class="eqs">
+        <div class="eq">$$ x_t = (1-t)\,\epsilon + t\,x_1, \qquad \epsilon \sim \mathcal{N}(0, I) $$<small>\(x_1\): clean image, \(x_0 = \epsilon\): pure noise</small></div>
+      </div>
+      <p>
+        As shown below, at t = 0.25 only the coarse outline of the dog survives, while at t = 0.75 the image is just grainy.
+      </p>
+      <figure class="fig panel"><img src="./PartA/training_inputs.jpg" alt="Original Yorkshire terrier photo and noisy versions at t = 0.25, 0.5 and 0.75" /><figcaption>Original and noisy inputs at t = 0.25, 0.50, 0.75</figcaption></figure>
+      <a class="to-top" href="#top">&uarr; Back to top</a>
+    </section>
+
+    <section class="part" id="a1-2">
+      <p class="part__label">Part A &middot; 1.2</p>
+      <h2 class="part__title">Classical Denoising</h2>
+      <p>
+        As a classical baseline, we rescale \(x_t\) by \(1/t\) to restore the image intensity. This leaves \(x_1\) plus Gaussian noise with standard deviation \((1-t)/t\), which we remove with a Gaussian blur. For each \(t\), we choose \(\sigma \in \{1, 2, 4, 8, 16\}\) that minimizes the MSE to the clean image.
+      </p>
+      <div class="eqs two">
+        <div class="eq">$$ \frac{x_t}{t} = x_1 + \frac{1-t}{t}\,\epsilon $$<small>noise std \((1-t)/t\) = 3, 1, 1/3</small></div>
+        <div class="eq">$$ \hat{x}_1^{\text{blur}} = G_\sigma\!\left(\frac{x_t}{t}\right) $$<small>\(G_\sigma\): Gaussian filter, kernel size \(6\sigma + 1\)</small></div>
+      </div>
+      <p>
+        As shown below, the optimal \(\sigma\) halves as \(t\) increases (8, 4, 2), following the drop in noise level. Since blur cannot separate noise from texture, the fur is removed along with the noise, and at t = 0.25 only colored blotches remain.
+      </p>
+      <div class="g g3">
+      <figure><img src="./PartA/blur_0_25.jpg" alt="Noisy image at t = 0.25 and its Gaussian blur with sigma 8" /><figcaption>t = 0.25, \(\sigma\) = 8</figcaption></figure>
+      <figure><img src="./PartA/blur_0_5.jpg" alt="Noisy image at t = 0.5 and its Gaussian blur with sigma 4" /><figcaption>t = 0.50, \(\sigma\) = 4</figcaption></figure>
+      <figure><img src="./PartA/blur_0_75.jpg" alt="Noisy image at t = 0.75 and its Gaussian blur with sigma 2" /><figcaption>t = 0.75, \(\sigma\) = 2</figcaption></figure>
+      </div>
+      <a class="to-top" href="#top">&uarr; Back to top</a>
+    </section>
+
+    <section class="part" id="a1-3">
+      <p class="part__label">Part A &middot; 1.3</p>
+      <h2 class="part__title">One-Step Denoising</h2>
+      <p>
+        The model predicts a velocity \(v_\theta(x_t, t, c) \approx x_1 - \epsilon\). Since \(x_1 - x_t = (1-t)(x_1 - \epsilon)\), a single step of size \(1-t\) reaches \(x_1\) exactly when the prediction is perfect. We condition on \(c\) = &ldquo;a high quality photo&rdquo;.
+      </p>
+      <div class="eqs">
+        <div class="eq">$$ \hat{x}_1 = x_t + (1-t)\, v_\theta(x_t, t, c) $$<small>one-step estimate</small></div>
+      </div>
+      <p>
+        As shown below, one step outperforms the blur at every \(t\). Even at t = 0.25 the pose and colors are correct, but the result is over-smoothed. With an MSE objective, the model predicts the conditional mean \(\mathbb{E}[x_1 \mid x_t]\), which averages over many plausible sharp images. As \(t\) increases, this distribution narrows and the estimate becomes sharper.
+      </p>
+      <figure class="fig panel"><img src="./PartA/one_step_0_25.jpg" alt="Original, noisy input at t = 0.25 and one-step estimate" /><figcaption>t = 0.25</figcaption></figure>
+      <figure class="fig panel"><img src="./PartA/one_step_0_5.jpg" alt="Original, noisy input at t = 0.5 and one-step estimate" /><figcaption>t = 0.50</figcaption></figure>
+      <figure class="fig panel"><img src="./PartA/one_step_0_75.jpg" alt="Original, noisy input at t = 0.75 and one-step estimate" /><figcaption>t = 0.75</figcaption></figure>
+      <a class="to-top" href="#top">&uarr; Back to top</a>
+    </section>
+
+    <section class="part" id="a1-4">
+      <p class="part__label">Part A &middot; 1.4</p>
+      <h2 class="part__title">Visualizing Velocity</h2>
+      <p>
+        Since we have the clean image, we know the ground-truth update \(x_1 - x_t\) at each \(t\). We compare it with the predicted update and compute the per-pixel RMS error over RGB. Updates are shown on a symmetric scale centered at gray, and all error maps share one color range.
+      </p>
+      <div class="eqs two">
+        <div class="eq">$$ (1-t)\,\hat{v}_t \;\;\text{vs.}\;\; (1-t)\,v_{\text{gt}} = x_1 - x_t $$<small>predicted vs. ground-truth update</small></div>
+        <div class="eq">$$ E_t = \sqrt{\operatorname{mean}_{\text{RGB}}\!\Big(\big[(1-t)(\hat{v}_t - v_{\text{gt}})\big]^2\Big)} $$<small>per-pixel error</small></div>
+      </div>
+      <p>
+        As shown below, the error concentrates on high-frequency structure (fur, eyes, board edges), the same detail missing in 1.3. It decreases with \(t\), both because the update is scaled by \(1-t\) and because the input has more signal.
+      </p>
+      <figure class="fig" style="max-width: 220px;"><img src="./PartA/velocity_original.jpg" alt="Original Yorkshire terrier image" /><figcaption>Original</figcaption></figure>
+      <figure class="fig panel"><img src="./PartA/velocity_0_25.jpg" alt="Noisy image, predicted update, ground-truth update and error map at t = 0.25" /><figcaption>t = 0.25</figcaption></figure>
+      <figure class="fig panel"><img src="./PartA/velocity_0_50.jpg" alt="Noisy image, predicted update, ground-truth update and error map at t = 0.5" /><figcaption>t = 0.50</figcaption></figure>
+      <figure class="fig panel"><img src="./PartA/velocity_0_75.jpg" alt="Noisy image, predicted update, ground-truth update and error map at t = 0.75" /><figcaption>t = 0.75</figcaption></figure>
+      <a class="to-top" href="#top">&uarr; Back to top</a>
+    </section>
+
+    <section class="part" id="a1-5">
+      <p class="part__label">Part A &middot; 1.5</p>
+      <h2 class="part__title">Iterative Denoising with Euler Sampling</h2>
+      <p>
+        We take many small steps here instead of a single jump, and evaluate a new velocity at each step. Starting from the t = 0.5 input, this takes 25 updates.
+      </p>
+      <div class="eqs">
+        <div class="eq">$$ x_{t+h} = x_t + h\, v_\theta(x_t, t, c), \qquad h = 0.02 $$<small>Euler update</small></div>
+      </div>
+      <p>
+        As shown below, Euler recovers individual strands of fur that one-step denoising smooths out. Its MSE is still higher than the one-step estimate. The one-step estimate is the conditional mean, which minimizes MSE by construction, while Euler produces a single sharp sample whose fine texture does not align pixel by pixel with the original.
+      </p>
+      <figure class="fig panel w70"><img src="./PartA/trajectory.jpg" alt="Euler trajectory from t = 0.5 to t = 1.0, shown every fifth update" /><figcaption>Initial state, every 5th update, and final image</figcaption></figure>
+      <figure class="fig panel"><img src="./PartA/comparison.jpg" alt="Original, Gaussian blur, one-step and Euler results from the same t = 0.5 input" /><figcaption>Same t = 0.5 input: blur, one step, and Euler</figcaption></figure>
+      <div class="data-table-wrap" style="max-width: 420px; margin: 8px auto 0;">
+        <table class="data-table">
+          <thead><tr><th>Method (t = 0.5)</th><th>MSE</th></tr></thead>
+          <tbody>
+            <tr><td>Gaussian blur (\(\sigma = 4\))</td><td>0.0158</td></tr>
+            <tr><td>One step</td><td>0.0070</td></tr>
+            <tr><td>Euler, 25 steps</td><td>0.0089</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <a class="to-top" href="#top">&uarr; Back to top</a>
+    </section>
+
+    <section class="part" id="a1-6">
+      <p class="part__label">Part A &middot; 1.6</p>
+      <h2 class="part__title">Generating Images from Noise</h2>
+      <p>
+        We run the same sampler from \(t = 0\) with pure noise (seeds 180&ndash;187) and the prompt &ldquo;a high quality photo&rdquo;, without guidance.
+      </p>
+      <p>
+        As shown below, all eight samples are head-and-shoulders portraits, so the model associates the generic prompt with portraits. Quality varies widely: seed 180 has no face and seed 183 is distorted, while 182 and 184 are reasonable. Without guidance, the conditional velocity stays close to an average over many images, and fine structure is not resolved.
+      </p>
+      <figure class="fig panel"><img src="./PartA/conditional_samples.jpg" alt="Eight samples generated from pure noise with seeds 180 to 187" /><figcaption>Conditional samples, seeds 180&ndash;187</figcaption></figure>
+      <a class="to-top" href="#top">&uarr; Back to top</a>
+    </section>
+
+    <section class="part" id="a2-1">
+      <p class="part__label">Part A &middot; 2.1</p>
+      <h2 class="part__title">Classifier-Free Guidance (CFG)</h2>
+      <p>
+        CFG evaluates the model with the prompt (\(v_c\)) and with the empty prompt (\(v_u\)) at the same \(x_t\) and \(t\), then extrapolates along their difference. Setting \(w = 0\) recovers conditional sampling. We reuse the initial noises from 1.6.
+      </p>
+      <div class="eqs">
+        <div class="eq">$$ v_{\text{cfg}} = v_c + w\,(v_c - v_u), \qquad w = 7 $$<small>CFG velocity</small></div>
+      </div>
+      <p>
+        As shown below, CFG fixes the failure cases from 1.6: seed 180 now has a full face and seed 183 is a normal portrait. All samples are sharper, with cleaner faces and lighting. The cost is diversity. Every sample is now a centered studio headshot with similar lighting, and the older and more stylized subjects from 1.6 are gone.
+      </p>
+      <figure class="fig panel"><img src="./PartA/cfg_samples.jpg" alt="Eight CFG samples with seeds 180 to 187" /><figcaption>CFG samples, w = 7, seeds 180&ndash;187</figcaption></figure>
+      <a class="to-top" href="#top">&uarr; Back to top</a>
+    </section>
+
+    <section class="part" id="a3-1">
+      <p class="part__label">Part A &middot; 3.1</p>
+      <h2 class="part__title">Image-to-Image Editing</h2>
+      <p>
+        We noise an input image to a start time \(t_s\) using the forward process from 1.1, then integrate with CFG from \(t_s\) to 1. A smaller \(t_s\) leaves more noise, which gives the model more freedom to change the image.
+      </p>
+      <div class="eqs">
+        <div class="eq">$$ x_{t_s} = (1-t_s)\,\epsilon + t_s\,x_1 \;\longrightarrow\; \text{Euler + CFG from } t_s \text{ to } 1 $$<small>\(t_s \in \{0.02, 0.04, 0.06, 0.10, 0.14, 0.25, 0.50\}\), prompt &ldquo;a high quality photo&rdquo;</small></div>
+      </div>
+      <p>
+        As shown below, low start times keep only color and coarse layout, while high start times keep the image. The Campanile keeps its tall white silhouette at every start time and recovers its windows and clock only at 0.25&ndash;0.5. The Yorkie turns into people for t<sub>s</sub> &le; 0.06, as the tan region is read as skin, and into a dog&ndash;human mix at 0.10&ndash;0.14. The cat becomes a tablet, a person in bed, and a book, each keeping the white diagonal shape. At 0.25 the chair is back while the cat is still a white blanket, so coarse structure returns before fine detail.
+      </p>
+      <figure class="fig panel"><img src="./PartA/edit_campanile.jpg" alt="Campanile edits at seven start times" /><figcaption>Campanile</figcaption></figure>
+      <figure class="fig panel"><img src="./PartA/edit_my_image_1.jpg" alt="Yorkie edits at seven start times" /><figcaption>My image 1: Yorkie</figcaption></figure>
+      <figure class="fig panel"><img src="./PartA/edit_my_image_2.jpg" alt="Cat on a chair edits at seven start times" /><figcaption>My image 2: cat on a chair</figcaption></figure>
+      <h4>Hand-Drawn and Web Images</h4>
+      <p>
+        This procedure is most interesting for non-realistic inputs, which the model projects onto the manifold of natural images. We use a Picasso-style face from the web and two simple drawings.
+      </p>
+      <p>
+        As shown below, the painting is projected most clearly. At 0.02 it becomes a photo of a woman, and at 0.06&ndash;0.10 photographic eyes, nose, and lips appear inside the flat color blocks. The drawings never become a realistic dog or cat. Below 0.06, the model replaces them with typical photos of a tan or gray shape on white: a portrait, a catalog shirt with imitated caption text, a gray object in a hand. From 0.06 on, it keeps the cartoon, since clip art is also part of its training distribution. At 0.10 the puppy briefly takes on a human face.
+      </p>
+      <figure class="fig panel"><img src="./PartA/edit_web_image.jpg" alt="Picasso-style face painting edits at seven start times" /><figcaption>Web image: Picasso-style face</figcaption></figure>
+      <figure class="fig panel"><img src="./PartA/edit_drawing_1.jpg" alt="Puppy drawing edits at seven start times" /><figcaption>Drawing 1: puppy</figcaption></figure>
+      <figure class="fig panel"><img src="./PartA/edit_drawing_2.jpg" alt="Cat drawing edits at seven start times" /><figcaption>Drawing 2: cat</figcaption></figure>
+      <a class="to-top" href="#top">&uarr; Back to top</a>
+    </section>
+
+    <section class="part" id="a3-2">
+      <p class="part__label">Part A &middot; 3.2</p>
+      <h2 class="part__title">Text-Guided Image Editing</h2>
+      <p>
+        We repeat 3.1 with a new text prompt in place of &ldquo;a high quality photo&rdquo;. Each prompt roughly matches the shape and colors of its input, so the edit stays anchored to the original layout.
+      </p>
+      <p>
+        As shown below, the prompt dominates at low start times and the original is lost. The middle start times are the most interesting. At 0.10 the doctor&rsquo;s gown stretches to fill the tower&rsquo;s silhouette. At 0.25 the muffin takes the dog&rsquo;s place, with the dark back rendered as a chocolate lump, and at 0.5 the Yorkie keeps its shape with muffin-like fur. At 0.5 the beluga lies across the chevron chair in the cat&rsquo;s pose.
+      </p>
+      <figure class="fig panel"><img src="./PartA/text_edit_campanile.jpg" alt="Campanile edited toward a doctor in a white gown" /><figcaption>Campanile &rarr; <span class="prompt">&ldquo;a photo of a doctor in a white gown standing under a blue sky&rdquo;</span></figcaption></figure>
+      <figure class="fig panel"><img src="./PartA/text_edit_my_image_1.jpg" alt="Yorkie edited toward a chocolate chip muffin" /><figcaption>Yorkie &rarr; <span class="prompt">&ldquo;a photo of a chocolate chip muffin on a wooden table&rdquo;</span></figcaption></figure>
+      <figure class="fig panel"><img src="./PartA/text_edit_my_image_2.jpg" alt="Cat on a chair edited toward a beluga whale" /><figcaption>Cat &rarr; <span class="prompt">&ldquo;a photo of a beluga whale swimming in the ocean&rdquo;</span></figcaption></figure>
+      <a class="to-top" href="#top">&uarr; Back to top</a>
+    </section>
+
+    <section class="part" id="a3-3">
+      <p class="part__label">Part A &middot; 3.3</p>
+      <h2 class="part__title">Visual Anagrams</h2>
+      <p>
+        At each Euler step, we compute the CFG velocity for prompt \(p_1\) on \(x_t\) and for \(p_2\) on the 180&deg;-rotated \(x_t\), rotate the second one back, and average the two. The result follows \(p_1\) upright and \(p_2\) when flipped.
+      </p>
+      <div class="eqs two">
+        <div class="eq">$$ v_1 = v_{\text{cfg}}(x_t, t, p_1), \quad v_2 = \text{flip}\big(v_{\text{cfg}}(\text{flip}(x_t), t, p_2)\big) $$<small>flip: 180&deg; rotation</small></div>
+        <div class="eq">$$ v = \tfrac{1}{2}\,(v_1 + v_2) $$<small>used in the Euler update from t = 0</small></div>
+      </div>
+      <p>
+        As shown below, in the first anagram the campfire becomes the glow on the old man&rsquo;s forehead, and the people become the shadows of his face. In the second, the mountains and rooftops of the village form the horse&rsquo;s body when flipped.
+      </p>
+      <div class="g g2">
+      <figure><img src="./PartA/anagram_views_0.jpg" alt="Anagram: old man upright, people around a campfire when flipped" /><figcaption>&ldquo;an oil painting of an old man&rdquo; / flipped: &ldquo;an oil painting of people around a campfire&rdquo;</figcaption></figure>
+      <figure><img src="./PartA/anagram_views_1.jpg" alt="Anagram: snowy mountain village upright, horse when flipped" /><figcaption>&ldquo;a lithograph of a snowy mountain village&rdquo; / flipped: &ldquo;a lithograph of a horse&rdquo;</figcaption></figure>
+      </div>
+      <a class="to-top" href="#top">&uarr; Back to top</a>
+    </section>
+
+    <section class="part" id="a3-4">
+      <p class="part__label">Part A &middot; 3.4</p>
+      <h2 class="part__title">Hybrid Images</h2>
+      <p>
+        We combine the low frequencies of one velocity estimate with the high frequencies of another. This is the hybrid image from Project 2, applied to the velocity at every step rather than to finished images. The high-pass component is the velocity minus its low-pass version.
+      </p>
+      <div class="eqs">
+        <div class="eq">$$ v = G_\sigma(v_1) + \big(v_2 - G_\sigma(v_2)\big) $$<small>\(v_1\): distant prompt, \(v_2\): close prompt; kernel size 265, \(\sigma = 16\)</small></div>
+      </div>
+      <p>
+        As shown below, the waterfall and the forest dominate up close. Viewed small, the waterfall&rsquo;s outline and dark falls form a skull, and the two tree crowns at the top form the cat&rsquo;s ears.
+      </p>
+      <div class="g g2">
+        <div class="far-view">
+          <figure class="close"><img src="./PartA/hybrid_0.jpg" alt="Hybrid image: a waterfall up close" /><figcaption>Close: &ldquo;a lithograph of a waterfall&rdquo;</figcaption></figure>
+          <figure class="far"><img src="./PartA/hybrid_0.jpg" alt="Same hybrid shown small: a skull" /><figcaption>Far: &ldquo;a lithograph of a skull&rdquo;</figcaption></figure>
+        </div>
+        <div class="far-view">
+          <figure class="close"><img src="./PartA/hybrid_1.jpg" alt="Hybrid image: a forest up close" /><figcaption>Close: &ldquo;a lithograph of a forest&rdquo;</figcaption></figure>
+          <figure class="far"><img src="./PartA/hybrid_1.jpg" alt="Same hybrid shown small: a cat" /><figcaption>Far: &ldquo;a lithograph of a cat&rdquo;</figcaption></figure>
+        </div>
+      </div>
+      <a class="to-top" href="#top">&uarr; Back to top</a>
+    </section>
+
+    <section class="part" id="bw-anagrams">
+      <p class="part__label">Bells &amp; Whistles</p>
+      <h2 class="part__title">More Visual Anagrams</h2>
+      <p>
+        We generalize 3.3 to any orthogonal view \(V\), following <a href="https://arxiv.org/abs/2311.17919">Visual Anagrams</a> (Geng et al., 2024). Orthogonality keeps \(V\epsilon\) standard Gaussian, so the model sees in-distribution inputs at every step. We use a 90&deg; rotation and color negation.
+      </p>
+      <div class="eqs two">
+        <div class="eq">$$ v = \tfrac{1}{2}\Big(v_{\text{cfg}}(x_t, t, p_1) + V^{-1}\, v_{\text{cfg}}(V x_t, t, p_2)\Big) $$<small>general view \(V\)</small></div>
+        <div class="eq">$$ V_{\text{rot}}: \text{rotate } 90^\circ, \qquad V_{\text{neg}}: x \mapsto -x $$<small>negation inverts light and dark</small></div>
+      </div>
+      <p>
+        As shown below, in the rotation anagram the lighthouse roofs become the fox&rsquo;s eye and snout, and the cliff becomes its fur. Negation needs an image that reads correctly in both polarities. A charcoal style works well here, since an inverted gray drawing still looks like a drawing.
+      </p>
+      <div class="g g2">
+      <figure><img src="./PartA/anagram_rotate90_views_0.jpg" alt="Anagram: lighthouse on a cliff upright, fox when rotated 90 degrees" /><figcaption>Rotate 90&deg;: lighthouse on a cliff &rarr; fox</figcaption></figure>
+      <figure><img src="./PartA/anagram_negate_views_1.jpg" alt="Anagram: charcoal snowy mountain, and a wolf when negated" /><figcaption>Negate: snowy mountain &rarr; wolf</figcaption></figure>
+      </div>
+      <a class="to-top" href="#top">&uarr; Back to top</a>
+    </section>
+
+    <section class="part" id="bw-logo">
+      <p class="part__label">Bells &amp; Whistles</p>
+      <h2 class="part__title">Course Logo</h2>
+      <p>
+        We apply text-guided editing (3.2) to the Oski bottle-cap logo, whose round gold shape and ridged edge are already close to a coin. The course name is left out of the prompt, since the model does not render text reliably.
+      </p>
+      <p>
+        As shown below, for t<sub>s</sub> &le; 0.06 only the round gold shape survives and the prompt dominates, giving a realistic coin with a grizzly bear relief. At 0.10, Oski&rsquo;s face, hat, and ridged edge return as engraved gold, and we use this frame as the logo. Above 0.14 the cartoon colors return, and the &ldquo;CAL&rdquo; lettering degrades into &ldquo;UCI&rdquo; and &ldquo;OAL&rdquo;.
+      </p>
+      <figure class="fig panel"><img src="./PartA/logo.jpg" alt="Oski bottle-cap logo edited into a gold coin at seven start times" /><figcaption>Oski logo &rarr; <span class="prompt">&ldquo;a photo of a gold coin with an embossed bear face&rdquo;</span></figcaption></figure>
+      <a class="to-top" href="#top">&uarr; Back to top</a>
+    </section>
+
+    <h2 class="part-heading" id="partb">Part B &middot; Flow Matching from Scratch</h2>
+
+    <section class="part" id="b1-2">
+      <p class="part__label">Part B &middot; 1.1&ndash;1.2</p>
+      <h2 class="part__title">Single-Step Denoising UNet</h2>
+      <p>
+        We train a UNet \(D_\theta\) to map a noisy digit \(z\) back to the clean digit \(x\). The UNet has two downsampling and two upsampling stages with hidden dimension \(D\), an average-pooling bottleneck, and skip connections by channel concatenation. Noisy inputs are generated by adding Gaussian noise with standard deviation \(\sigma\).
+      </p>
+      <div class="eqs">
+        <div class="eq">$$ z = x + \sigma\,\epsilon, \qquad \epsilon \sim \mathcal{N}(0, I) $$<small>noising process</small></div>
+      </div>
+      <p>
+        As shown below, digits are easy to read up to \(\sigma = 0.5\) and are mostly lost at \(\sigma = 1.0\).
+      </p>
+      <figure class="fig panel w70"><img src="./PartB/noise_levels.png" alt="MNIST digits with noise levels 0, 0.2, 0.4, 0.5, 0.6, 0.8 and 1.0 by row" /><figcaption>Rows: \(\sigma\) = 0.0, 0.2, 0.4, 0.5, 0.6, 0.8, 1.0</figcaption></figure>
+      <a class="to-top" href="#top">&uarr; Back to top</a>
+    </section>
+
+    <section class="part" id="b1-2-1">
+      <p class="part__label">Part B &middot; 1.2.1</p>
+      <h2 class="part__title">Training the Denoiser</h2>
+      <p>
+        We train with \(\sigma = 0.5\) and the L2 loss below, using batch size 256, Adam with learning rate \(10^{-4}\), \(D = 128\), and 5 epochs. A new \(\epsilon\) is sampled every time a batch is fetched, so the model never sees the same noisy image twice.
+      </p>
+      <div class="eqs">
+        <div class="eq">$$ L = \mathbb{E}_{z, x}\, \big\| D_\theta(z) - x \big\|^2 $$<small>denoising loss</small></div>
+      </div>
+      <p>
+        As shown below, the loss drops sharply within the first epoch and then flattens. After epoch 1 the outputs are already clean but slightly blurry. After epoch 5 the strokes are sharper and closer to the originals.
+      </p>
+      <figure class="fig w60"><img src="./PartB/denoise_loss.png" alt="Training loss curve of the denoiser at sigma 0.5" /><figcaption>Per-step loss (blue) and running average (orange)</figcaption></figure>
+      <figure class="fig panel"><img src="./PartB/denoise_epoch1.png" alt="Test digits: clean, noisy input and denoised output after epoch 1" /><figcaption>Epoch 1. Rows: clean, noisy input (\(\sigma\) = 0.5), output</figcaption></figure>
+      <figure class="fig panel"><img src="./PartB/denoise_epoch5.png" alt="Test digits: clean, noisy input and denoised output after epoch 5" /><figcaption>Epoch 5. Rows: clean, noisy input (\(\sigma\) = 0.5), output</figcaption></figure>
+      <a class="to-top" href="#top">&uarr; Back to top</a>
+    </section>
+
+    <section class="part" id="b1-2-2">
+      <p class="part__label">Part B &middot; 1.2.2</p>
+      <h2 class="part__title">Out-of-Distribution Testing</h2>
+      <p>
+        We evaluate the \(\sigma = 0.5\) model on a fixed test digit at noise levels it was not trained on.
+      </p>
+      <p>
+        As shown below, the denoiser generalizes well for \(\sigma \le 0.6\). At \(\sigma = 0.8\) the stroke starts to fade, and at \(\sigma = 1.0\) the 7 breaks into fragments, since the model never saw noise this strong during training.
+      </p>
+      <figure class="fig panel w70"><img src="./PartB/denoise_ood.png" alt="A test digit 7 at seven noise levels and the denoised outputs" /><figcaption>Columns: \(\sigma\) = 0.0, 0.2, 0.4, 0.5, 0.6, 0.8, 1.0. Rows: input, output</figcaption></figure>
+      <a class="to-top" href="#top">&uarr; Back to top</a>
+    </section>
+
+    <section class="part" id="b1-2-3">
+      <p class="part__label">Part B &middot; 1.2.3</p>
+      <h2 class="part__title">Denoising Pure Noise</h2>
+      <p>
+        We train the same model with pure noise \(\epsilon \sim \mathcal{N}(0, I)\) as input and clean digits as targets, with the same hyperparameters.
+      </p>
+      <div class="eqs">
+        <div class="eq">$$ L = \mathbb{E}_{\epsilon, x}\, \big\| D_\theta(\epsilon) - x \big\|^2 \;\;\Rightarrow\;\; D_\theta^*(\epsilon) = \mathbb{E}[x] $$<small>the input has no information about the target</small></div>
+      </div>
+      <p>
+        As shown below, the model outputs the same blurry blob for every input, which looks like a superposition of all digits. Since the input is independent of the target, the MSE-optimal prediction is the mean of the training set. The model learns to ignore its input and predict this average, so the loss plateaus around 0.07 instead of approaching zero.
+      </p>
+      <figure class="fig w60"><img src="./PartB/pure_noise_loss.png" alt="Training loss curve of the pure-noise denoiser" /><figcaption>Per-step loss (blue) and running average (orange)</figcaption></figure>
+      <figure class="fig panel"><img src="./PartB/pure_noise_epoch1.png" alt="Pure noise inputs and outputs after epoch 1" /><figcaption>Epoch 1. Rows: pure noise input, output</figcaption></figure>
+      <figure class="fig panel"><img src="./PartB/pure_noise_epoch5.png" alt="Pure noise inputs and outputs after epoch 5" /><figcaption>Epoch 5. Rows: pure noise input, output</figcaption></figure>
+      <a class="to-top" href="#top">&uarr; Back to top</a>
+    </section>
+
+    <section class="part" id="b2-2">
+      <p class="part__label">Part B &middot; 2.1&ndash;2.2</p>
+      <h2 class="part__title">Training a Time-Conditioned UNet</h2>
+      <p>
+        For flow matching, we interpolate between noise \(x_0\) and data \(x_1\) and train the UNet to predict the velocity \(x_1 - x_0\). We inject the scalar time \(t \in [0, 1]\) with two FCBlocks (Linear, GELU, Linear), whose outputs \(t_1, t_2\) scale the bottleneck and the first upsampling features.
+      </p>
+      <div class="eqs two">
+        <div class="eq">$$ x_t = (1-t)\,x_0 + t\,x_1, \qquad x_0 \sim \mathcal{N}(0, I) $$<small>\(t \sim U[0, 1]\)</small></div>
+        <div class="eq">$$ L = \mathbb{E}\, \big\| (x_1 - x_0) - u_\theta(x_t, t) \big\|^2 $$<small>flow matching loss</small></div>
+      </div>
+      <div class="eqs">
+        <div class="eq">$$ \text{unflatten} \leftarrow t_1 \odot \text{unflatten}, \qquad \text{up}_1 \leftarrow t_2 \odot \text{up}_1 $$<small>time conditioning</small></div>
+      </div>
+      <p>
+        We use \(D = 64\), batch size 64, and Adam with an initial learning rate of \(10^{-2}\), decayed by \(\gamma = 0.1^{1/10}\) after each of the 10 epochs. As shown below, the loss drops sharply in the first few hundred steps and then decreases slowly.
+      </p>
+      <figure class="fig w60"><img src="./PartB/time_loss.png" alt="Training loss curve of the time-conditioned UNet" /><figcaption>Per-step loss (blue) and running average (orange)</figcaption></figure>
+      <a class="to-top" href="#top">&uarr; Back to top</a>
+    </section>
+
+    <section class="part" id="b2-3">
+      <p class="part__label">Part B &middot; 2.3</p>
+      <h2 class="part__title">Sampling from the Time-Conditioned UNet</h2>
+      <p>
+        We start from \(x_0 \sim \mathcal{N}(0, I)\) and integrate with Euler steps, using \(T = 50\) steps and the same seed for every checkpoint.
+      </p>
+      <div class="eqs">
+        <div class="eq">$$ x \leftarrow x + \tfrac{1}{T}\, u_\theta(x, t), \qquad t = 0, \tfrac{1}{T}, \dots, \tfrac{T-1}{T} $$<small>Euler sampling</small></div>
+      </div>
+      <p>
+        As shown below, epoch 1 produces stroke-like scribbles with no digit structure. By epoch 5 most samples resemble digits, and epoch 10 refines them, but many samples are still malformed or ambiguous, such as mixtures of 3 and 5 or 8 and 9. Without class information, the model has to pick a digit implicitly from the noise, and some trajectories end up between two digits.
+      </p>
+      <figure class="fig panel"><img src="./PartB/time_epoch1.png" alt="Time-conditioned samples after epoch 1" /><figcaption>Epoch 1</figcaption></figure>
+      <figure class="fig panel"><img src="./PartB/time_epoch5.png" alt="Time-conditioned samples after epoch 5" /><figcaption>Epoch 5</figcaption></figure>
+      <figure class="fig panel"><img src="./PartB/time_epoch10.png" alt="Time-conditioned samples after epoch 10" /><figcaption>Epoch 10</figcaption></figure>
+      <a class="to-top" href="#top">&uarr; Back to top</a>
+    </section>
+
+    <section class="part" id="b2-5">
+      <p class="part__label">Part B &middot; 2.4&ndash;2.5</p>
+      <h2 class="part__title">Training a Class-Conditioned UNet</h2>
+      <p>
+        We add class conditioning with a one-hot vector \(c\) and two more FCBlocks. The class embeddings \(c_1, c_2\) scale the features and the time embeddings shift them. During training, \(c\) is set to zero with probability \(p_{\text{uncond}} = 0.1\), so the same network also learns the unconditional velocity needed for CFG. All other hyperparameters match 2.2.
+      </p>
+      <div class="eqs">
+        <div class="eq">$$ \text{unflatten} \leftarrow c_1 \odot \text{unflatten} + t_1, \qquad \text{up}_1 \leftarrow c_2 \odot \text{up}_1 + t_2 $$<small>class and time conditioning</small></div>
+      </div>
+      <p>
+        As shown below, the loss behaves like the time-only model: a sharp initial drop followed by slow improvement.
+      </p>
+      <figure class="fig w60"><img src="./PartB/class_loss.png" alt="Training loss curve of the class-conditioned UNet" /><figcaption>Per-step loss (blue) and running average (orange)</figcaption></figure>
+      <a class="to-top" href="#top">&uarr; Back to top</a>
+    </section>
+
+    <section class="part" id="b2-6">
+      <p class="part__label">Part B &middot; 2.6</p>
+      <h2 class="part__title">Sampling from the Class-Conditioned UNet</h2>
+      <p>
+        We sample with classifier-free guidance using \(\gamma = 5\) and \(T = 300\) Euler steps, generating four samples of each digit.
+      </p>
+      <div class="eqs">
+        <div class="eq">$$ u = u_\theta(x, t, \varnothing) + \gamma\,\big(u_\theta(x, t, c) - u_\theta(x, t, \varnothing)\big), \qquad \gamma = 5 $$<small>CFG; \(\varnothing\): zeroed class vector</small></div>
+      </div>
+      <p>
+        As shown below, every digit is recognizable after epoch 1, although 4, 5, 8, and 9 still have broken strokes. By epoch 5 all classes are clean, and epoch 10 gives slightly bolder and more consistent digits. Conditioning removes the need to choose a digit from the noise, which is why this model converges much faster than the time-only one.
+      </p>
+      <figure class="fig panel"><img src="./PartB/class_epoch1.png" alt="Class-conditioned samples after epoch 1, four per digit" /><figcaption>Epoch 1</figcaption></figure>
+      <figure class="fig panel"><img src="./PartB/class_epoch5.png" alt="Class-conditioned samples after epoch 5, four per digit" /><figcaption>Epoch 5</figcaption></figure>
+      <figure class="fig panel"><img src="./PartB/class_epoch10.png" alt="Class-conditioned samples after epoch 10, four per digit" /><figcaption>Epoch 10</figcaption></figure>
+      <h4>Removing the Learning Rate Scheduler</h4>
+      <p>
+        The scheduler decays the learning rate from \(10^{-2}\) toward \(10^{-3}\) over training. A constant \(10^{-2}\) would stay too large in the later epochs, so we instead train with a constant learning rate of \(10^{-3}\), the scheduler&rsquo;s final value, for the same 10 epochs.
+      </p>
+      <p>
+        As shown below, the epoch-10 samples match the quality of the scheduled model. At epoch 1 the constant-rate model is even slightly better, since the scheduled model is still running at a large learning rate at that point.
+      </p>
+      <figure class="fig w60"><img src="./PartB/class_no_scheduler_loss.png" alt="Training loss curve of the class-conditioned UNet without a scheduler" /><figcaption>Per-step loss (blue) and running average (orange), constant learning rate 10<sup>&minus;3</sup></figcaption></figure>
+      <figure class="fig panel"><img src="./PartB/class_no_scheduler_epoch1.png" alt="Class-conditioned samples without scheduler after epoch 1" /><figcaption>No scheduler, epoch 1</figcaption></figure>
+      <figure class="fig panel"><img src="./PartB/class_no_scheduler_epoch5.png" alt="Class-conditioned samples without scheduler after epoch 5" /><figcaption>No scheduler, epoch 5</figcaption></figure>
+      <figure class="fig panel"><img src="./PartB/class_no_scheduler_epoch10.png" alt="Class-conditioned samples without scheduler after epoch 10" /><figcaption>No scheduler, epoch 10</figcaption></figure>
+      <a class="to-top" href="#top">&uarr; Back to top</a>
+    </section>
+
+    <section class="part" id="b-bw">
+      <p class="part__label">Part B &middot; Bells &amp; Whistles</p>
+      <h2 class="part__title">A Better Time-Conditioned UNet</h2>
+      <p>
+        We increase the hidden dimension from \(D = 64\) to \(D = 128\) and train for 20 epochs instead of 10, with the exponential decay stretched over 20 epochs. Everything else matches 2.2. We also sample the final model with 100 and 200 Euler steps in addition to the default 50.
+      </p>
+      <p>
+        As shown below, the samples are cleaner than the epoch-10 model from 2.3 with the same seeds: strokes are smoother, there are fewer fragments, and more samples are clearly readable. Increasing the number of Euler steps to 100 or 200 leaves the samples nearly unchanged, so the remaining errors come from the learned velocity field rather than from integration error.
+      </p>
+      <figure class="fig w60"><img src="./PartB/time_better_loss.png" alt="Training loss curve of the larger time-conditioned UNet" /><figcaption>Per-step loss (blue) and running average (orange)</figcaption></figure>
+      <figure class="fig panel"><img src="./PartB/time_epoch10.png" alt="Original time-conditioned samples after epoch 10" /><figcaption>2.3 model: D = 64, 10 epochs, 50 steps</figcaption></figure>
+      <figure class="fig panel"><img src="./PartB/time_better.png" alt="Improved time-conditioned samples, D 128, 20 epochs" /><figcaption>Improved: D = 128, 20 epochs, 50 steps</figcaption></figure>
+      <figure class="fig panel"><img src="./PartB/time_better_100steps.png" alt="Improved model sampled with 100 steps" /><figcaption>Improved, 100 steps</figcaption></figure>
+      <figure class="fig panel"><img src="./PartB/time_better_200steps.png" alt="Improved model sampled with 200 steps" /><figcaption>Improved, 200 steps</figcaption></figure>
+      <a class="to-top" href="#top">&uarr; Back to top</a>
+    </section>
+  </main>
+
+  <footer class="site-footer">
+    <div class="site-footer__inner">
+      &copy; <span id="yr"></span> Andrew Park &middot; CS280A, UC Berkeley
+    </div>
+  </footer>
+  <script>document.getElementById("yr").textContent = new Date().getFullYear();</script>
+  <script src="../../assets/lightbox.js"></script>
+</body>
+</html>
