@@ -224,7 +224,7 @@
         <p>Stacking the rows of all \(n\) correspondences gives a linear system, which we solve by least squares.</p>
         $$ A h = b, \qquad A \in \mathbb{R}^{2n \times 8}, \quad b \in \mathbb{R}^{2n} $$
         $$ \hat h = \arg\min_h \lVert A h - b \rVert^2 = (A^T A)^{-1} A^T b $$
-        <p>Four correspondences determine \(H\) exactly, but any click error then goes directly into \(H\). We use more than four, so least squares averages out the error. The solution \(\hat h\) is reshaped into \(H\) with 1 as the last entry.</p>
+        <p>Click errors cause errors in \(H\) but least squares averages out this error. The solution \(\hat h\) is reshaped into \(H\) with 1 as the last entry.</p>
       </div>
       <p class="step">Results</p>
       <p class="sub">Set 1 &middot; St. Petersburg Riverfront (boat5 &rarr; boat6)</p>
@@ -253,13 +253,13 @@
       <h2 class="part__title">Warping the Images</h2>
       <p class="step">Method</p>
       <div class="eq eq-merged">
-        <p>Warping changes where pixels are, not their values. We use inverse warping. For each output pixel we find its source location in the input image with \(H^{-1}\) and interpolate there. Unlike forward warping, this leaves no holes.</p>
-        <p><b>Output size.</b> The four input corners mapped through \(H\) give the bounding box of the warped image.</p>
+        <p>For each output pixel we find its source location in the input image with \(H^{-1}\) and interpolate there. Unlike forward warping, this leaves no holes.</p>
+        <p>The four input corners mapped through \(H\) give the bounding box of the warped image.</p>
         $$ (0, 0), \quad (M-1, 0), \quad (0, N-1), \quad (M-1, N-1) \;\;\xrightarrow{\;H\;}\;\; x_{\min}, x_{\max}, y_{\min}, y_{\max} $$
-        <p><b>Inverse map.</b> Output pixel \((u, v)\) maps back to its source location \((x, y)\).</p>
+        <p>Output pixel \((u, v)\) maps back to its source location \((x, y)\).</p>
         $$ \begin{bmatrix} \tilde x \\ \tilde y \\ \tilde w \end{bmatrix} = H^{-1} \begin{bmatrix} u + x_{\min} \\ v + y_{\min} \\ 1 \end{bmatrix}, \qquad (x, y) = \left( \frac{\tilde x}{\tilde w},\; \frac{\tilde y}{\tilde w} \right) $$
         <p>Pixel centers lie at integer coordinates. Output pixels whose source falls outside the input image stay black and get alpha 0.</p>
-        <p><b>Interpolation.</b> Nearest neighbor takes the value of the closest pixel.</p>
+        <p>Nearest neighbor takes the value of the closest pixel.</p>
         $$ g(u, v) = f\big(\operatorname{round}(x),\; \operatorname{round}(y)\big) $$
         <p>Bilinear blends the four surrounding pixels, weighted by the fractional offsets \(a = x - x_1\) and \(b = y - y_1\), where \(x_1 = \lfloor x \rfloor\), \(y_1 = \lfloor y \rfloor\), \(x_2 = x_1 + 1\) and \(y_2 = y_1 + 1\).</p>
         $$ g(u, v) = (1-a)(1-b)\, f_{11} + a(1-b)\, f_{21} + (1-a)\, b\, f_{12} + a\, b\, f_{22}, \qquad f_{ij} = f(x_i, y_j) $$
@@ -292,10 +292,10 @@
       <h2 class="part__title">Blending the Images into a Mosaic</h2>
       <p class="step">Method</p>
       <div class="eq eq-merged">
-        <p><b>Registration.</b> We leave one reference image unwarped, boat4 for Set 1, office2 for Set 2 and desk2 for Set 3, and warp the others into its frame with their homographies from A.2.</p>
-        <p><b>Canvas.</b> The canvas covers the reference image and all warped bounding boxes. A translation \(T\) moves its top left corner \((x_{\min}, y_{\min})\) to the origin.</p>
+        <p>We leave one reference image unwarped, boat4 for Set 1, office2 for Set 2 and desk2 for Set 3, and warp the others into its frame with their homographies from A.2.</p>
+        <p>The canvas covers the reference image and all warped bounding boxes. A translation \(T\) moves its top left corner \((x_{\min}, y_{\min})\) to the origin.</p>
         $$ T = \begin{bmatrix} 1 & 0 & -x_{\min} \\ 0 & 1 & -y_{\min} \\ 0 & 0 & 1 \end{bmatrix}, \qquad \text{image } i \mapsto T H_i, \qquad \text{reference} \mapsto T $$
-        <p><b>Blending.</b> Each image is weighted by its distance transform \(\alpha_i\), which is 1 at the image center and 0 at its border.</p>
+        <p>Each image is weighted by its distance transform \(\alpha_i\), which is 1 at the image center and 0 at its border.</p>
         $$ I(q) = \frac{\sum_i \alpha_i(q)\, I_i(q)}{\sum_i \alpha_i(q)} $$
         <p>This feathering blurs fine details that are slightly misaligned, so we use two band blending. The low band \(G_\sigma * I_i\) is feathered, and the high band \(I_i - G_\sigma * I_i\) is taken from the image with the largest \(\alpha_i\).</p>
       </div>
