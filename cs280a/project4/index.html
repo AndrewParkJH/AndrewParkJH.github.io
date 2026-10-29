@@ -1,0 +1,368 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Project 4 &mdash; CS280A &mdash; Andrew Park</title>
+  <link rel="stylesheet" href="../../assets/style.css" />
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.css" />
+  <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.js"></script>
+  <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/contrib/auto-render.min.js"
+    onload="renderMathInElement(document.body,{delimiters:[{left:'$$',right:'$$',display:true},{left:'\\(',right:'\\)',display:false}],throwOnError:false});"></script>
+  <style>
+    /* ---------- page-scoped layout for the Project 4 report ---------- */
+    /* skeleton placeholders: delete each .ph once the real content is in */
+    .ph {
+      border: 1.5px dashed #c98a3a; background: #fff9f0; border-radius: 10px;
+      padding: 26px 14px; text-align: center; color: #8a5a20; font-size: .85rem;
+    }
+    .ph code { font-size: .8rem; }
+    .ph-text { border: 1.5px dashed #c98a3a; background: #fff9f0; border-radius: 10px; padding: 10px 14px; color: #8a5a20; font-size: .92rem; }
+    .eq.ph-eq { border-style: dashed; border-color: #c98a3a; background: #fff9f0; color: #8a5a20; text-align: center; padding: 18px 16px; font-size: .88rem; }
+    .eq.eq-merged { padding: 14px 20px; }
+    .eq-merged p { margin: 8px 0; font-size: .95rem; }
+    .deliv { margin: 10px 0 0; padding-left: 18px; font-size: .9rem; color: var(--muted); }
+    figure { margin-inline: auto; }
+
+    /* at-a-glance overview */
+    .glance-group { margin-top: 36px; }
+    .glance-group h2 {
+      font-size: 0.8rem; font-weight: 700; letter-spacing: 0.12em;
+      text-transform: uppercase; color: var(--muted); margin: 0 0 12px;
+    }
+    .glance {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(210px, 1fr));
+      gap: 14px;
+    }
+    .glance a {
+      display: block; background: var(--surface); border: 1px solid var(--line);
+      border-radius: 12px; padding: 14px 16px; color: var(--ink);
+      transition: transform .15s ease, box-shadow .15s ease, border-color .15s ease;
+    }
+    .glance a:hover {
+      text-decoration: none; transform: translateY(-2px);
+      box-shadow: 0 10px 24px rgba(31,35,40,.07); border-color: #d9d2c6;
+    }
+    .glance .num { font-size: .74rem; font-weight: 700; color: var(--accent); letter-spacing: .08em; }
+    .glance .ttl { display: block; font-weight: 650; margin: 2px 0 4px; }
+    .glance .sum { display: block; font-size: .86rem; color: var(--muted); line-height: 1.45; }
+
+    /* section header */
+    .group-banner {
+      margin-top: 80px; padding: 18px 22px; border-radius: var(--radius);
+      background: var(--accent-soft); display: flex; align-items: baseline;
+      gap: 14px; flex-wrap: wrap;
+    }
+    .group-banner strong { font-size: 1.25rem; letter-spacing: -.01em; }
+    .group-banner span { color: var(--muted); font-size: .95rem; }
+    .group-banner + .part { border-top: 0; margin-top: 28px; }
+
+    .takeaway {
+      border-left: 3px solid var(--accent); background: var(--surface);
+      border-radius: 0 10px 10px 0; padding: 12px 16px; margin: 0 0 8px;
+      font-size: .98rem;
+    }
+    .takeaway b { color: var(--accent); font-size: .75rem; letter-spacing: .1em;
+      text-transform: uppercase; display: block; margin-bottom: 2px; }
+
+    /* Method / Results / Discussion step headings */
+    .step {
+      display: flex; align-items: center; gap: 10px; margin: 36px 0 12px;
+      font-size: .78rem; font-weight: 700; letter-spacing: .12em;
+      text-transform: uppercase; color: var(--muted);
+    }
+    .step::after { content: ""; flex: 1; height: 1px; background: var(--line); }
+    .step + p { margin-top: 0; }
+
+    .sub { font-weight: 650; font-size: 1.02rem; margin: 28px 0 8px; }
+
+    /* equations */
+    .eqs { display: grid; gap: 10px; margin: 16px 0; }
+    .eqs.two { grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); }
+    .eq {
+      background: var(--surface); border: 1px solid var(--line); border-radius: 12px;
+      padding: 6px 16px 10px; overflow-x: auto;
+    }
+    .eq .katex-display { margin: .6em 0 .3em; }
+    .eq small { display: block; color: var(--muted); font-size: .8rem; text-align: center; }
+
+    /* parameter chips */
+    .params { display: flex; flex-wrap: wrap; gap: 8px; margin: 14px 0 4px; padding: 0; list-style: none; }
+    .params li {
+      font-size: .82rem; background: var(--surface); border: 1px solid var(--line);
+      border-radius: 999px; padding: 3px 12px; color: var(--muted);
+    }
+    .params li b { color: var(--ink); font-weight: 600; }
+
+    /* figure grids */
+    .g { display: grid; gap: 14px; margin: 16px 0; align-items: start; }
+    .g2 { grid-template-columns: repeat(2, 1fr); }
+    .g3 { grid-template-columns: repeat(3, 1fr); }
+    .g4 { grid-template-columns: repeat(4, 1fr); }
+    .g-2-1 { grid-template-columns: 2fr 1fr; }
+    .g-1-1 { grid-template-columns: 1fr 1fr; align-items: center; }
+    .g figure, .fig { border-radius: 10px; }
+    .fig { margin: 16px auto; }
+    .w70 { max-width: 70%; } .w60 { max-width: 60%; } .w50 { max-width: 50%; }
+    .code2 { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+    .code2 pre { max-width: none; margin: 6px 0 0; }
+    .code2 p { margin: 0; font-size: .85rem; font-weight: 600; }
+    .note { font-size: .9rem; color: var(--muted); }
+
+    /* hybrid cards */
+    .hybrid {
+      display: grid; grid-template-columns: 110px 1fr 90px; gap: 14px;
+      align-items: end; margin: 16px 0;
+    }
+    .hybrid .inputs { display: grid; gap: 10px; }
+    .hybrid-card {
+      border: 1px solid var(--line); border-radius: var(--radius);
+      padding: 14px 16px 4px; background: #fffdf9;
+    }
+    .hybrid-card h4 { margin: 0; font-size: .95rem; }
+    .hybrid-card h4 span { color: var(--accent); font-weight: 500; font-size: .9rem; }
+    .hybrid-cards { display: grid; grid-template-columns: 1fr; gap: 16px; }
+    .h-inputs { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; margin: 10px 0 16px; }
+    .h-inputs figure { margin: 0; }
+    .h-inputs img { aspect-ratio: 3 / 2; object-fit: cover; object-position: center; }
+    .h-out { display: flex; align-items: flex-end; gap: 16px; margin-bottom: 12px; }
+    .h-out figure { margin: 0; }
+    .h-out .close { flex: 0 1 520px; }
+    .h-out .far { flex: 0 0 100px; }
+    .h-label { font-size: .72rem; font-weight: 700; letter-spacing: .1em; text-transform: uppercase; color: var(--muted); margin: 0; }
+
+    .to-top { display: inline-block; margin-top: 28px; font-size: .85rem; }
+
+    @media (max-width: 760px) {
+      .g3, .g4 { grid-template-columns: repeat(2, 1fr); }
+      .g2, .g-2-1, .g-1-1, .code2, .hybrid-cards { grid-template-columns: 1fr; }
+      .w70, .w60, .w50 { max-width: 100%; }
+    }
+    @media (max-width: 460px) { .g3, .g4 { grid-template-columns: 1fr; } }
+
+    .panel { margin: 16px auto; }
+    .far-view { display: flex; align-items: flex-end; gap: 16px; margin: 16px 0; }
+    .far-view figure { margin: 0; }
+    .far-view .close { flex: 0 1 420px; }
+    .far-view .far { flex: 0 0 72px; }
+    .prompt { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: .86rem; color: var(--ink); }
+    .lede { max-width: none; }
+    .part h4 { font-size: 1.02rem; margin: 28px 0 8px; }
+    .lede { max-width: none; }
+    .part h4 { font-size: 1.02rem; margin: 28px 0 8px; }
+    .lede { max-width: none; }
+    .part-heading { margin: 72px 0 0; padding-top: 28px; border-top: 2px solid var(--ink); font-size: 1.6rem; letter-spacing: -.01em; }
+    .part h4 { font-size: 1.02rem; margin: 28px 0 8px; }
+  </style>
+</head>
+<body>
+  <header class="site-header">
+    <div class="site-header__inner">
+      <a class="brand" href="../../index.html">Andrew <span>Park</span></a>
+      <nav class="nav">
+        <a href="../../index.html">Home</a>
+        <a href="../index.html" class="is-active">CS280A</a>
+      </nav>
+    </div>
+  </header>
+
+  <main>
+    <a class="back-link" href="../index.html">&larr; CS280A</a>
+
+    <p class="eyebrow">CS280A &middot; Project 4</p>
+    <h1 class="page-title" id="top">Image Warping and Mosaicing</h1>
+    <p class="lede">
+      In Part A, we shoot photos from a fixed center of projection, recover the
+      homographies between them, warp images with inverse warping, and blend them into panoramic mosaics.
+    </p>
+
+    <div class="glance-group">
+      <h2>Part A</h2>
+      <div class="glance">
+        <a href="#a1"><span class="num">A.1</span><span class="ttl">Shooting the Pictures</span></a><a href="#a2"><span class="num">A.2</span><span class="ttl">Recovering Homographies</span></a><a href="#a3"><span class="num">A.3</span><span class="ttl">Warping &amp; Rectification</span></a><a href="#a4"><span class="num">A.4</span><span class="ttl">Mosaic Blending</span></a><a href="#a5"><span class="num">A.5</span><span class="ttl">Spherical Mapping</span></a>
+      </div>
+    </div>
+
+    <h2 class="part-heading" id="parta">Part A &middot; Image Warping and Mosaicing</h2>
+
+    <section class="part" id="a1">
+      <p class="part__label">Part A &middot; A.1</p>
+      <h2 class="part__title">Shooting the Pictures</h2>
+      <p class="sub">Set 1 &middot; St. Petersburg Riverfront</p>
+      <div class="g g4">
+        <figure><img src="./PartA/set1_boat3.jpg" alt="St. Petersburg riverfront, OpenCV boat3" /><figcaption>boat3</figcaption></figure>
+        <figure><img src="./PartA/set1_boat4.jpg" alt="St. Petersburg riverfront, OpenCV boat4" /><figcaption>boat4</figcaption></figure>
+        <figure><img src="./PartA/set1_boat5.jpg" alt="St. Petersburg riverfront, OpenCV boat5" /><figcaption>boat5</figcaption></figure>
+        <figure><img src="./PartA/set1_boat6.jpg" alt="St. Petersburg riverfront, OpenCV boat6" /><figcaption>boat6</figcaption></figure>
+      </div>
+      <p class="note">Set 1 images are <code>boat3.jpg</code> through <code>boat6.jpg</code> from the OpenCV stitching test data (<a href="https://github.com/opencv/opencv_extra/tree/master/testdata/stitching">opencv/opencv_extra</a>), taken with a Canon EOS 40D at 25&nbsp;mm and shown downscaled.</p>
+      <p class="sub">Set 2 &middot; Office</p>
+      <div class="g g3">
+        <figure><img src="./PartA/set2_3.jpg" alt="Office interior, left view" /><figcaption>Left (office3)</figcaption></figure>
+        <figure><img src="./PartA/set2_2.jpg" alt="Office interior, center view" /><figcaption>Center (office2)</figcaption></figure>
+        <figure><img src="./PartA/set2_1.jpg" alt="Office interior, right view" /><figcaption>Right (office1)</figcaption></figure>
+      </div>
+      <p class="sub">Set 3 &middot; Desk</p>
+      <div class="g g3">
+        <figure><img src="./PartA/set3_1.jpg" alt="Desk with a circuit board and a tray, view 1 of 3" /><figcaption>Left (desk1)</figcaption></figure>
+        <figure><img src="./PartA/set3_2.jpg" alt="Desk with a circuit board and a tray, view 2 of 3" /><figcaption>Center (desk2)</figcaption></figure>
+        <figure><img src="./PartA/set3_3.jpg" alt="Desk with a circuit board and a tray, view 3 of 3" /><figcaption>Right (desk3)</figcaption></figure>
+      </div>
+      <a class="to-top" href="#top">&uarr; Back to top</a>
+    </section>
+
+    <section class="part" id="a2">
+      <p class="part__label">Part A &middot; A.2</p>
+      <h2 class="part__title">Recovering Homographies</h2>
+      <p class="step">Method</p>
+      <div class="eq eq-merged">
+        <p>A correspondence \((x, y) \leftrightarrow (x', y')\) is related by the homography \(H\) in homogeneous coordinates. We fix the last entry of \(H\) to 1, which leaves 8 unknowns.</p>
+        $$ \begin{bmatrix} w x' \\ w y' \\ w \end{bmatrix} = \begin{bmatrix} h_1 & h_2 & h_3 \\ h_4 & h_5 & h_6 \\ h_7 & h_8 & 1 \end{bmatrix} \begin{bmatrix} x \\ y \\ 1 \end{bmatrix} $$
+        <p>Dividing by \(w\) and rearranging gives two equations per correspondence that are linear in \(h_1, \dots, h_8\).</p>
+        $$ \begin{bmatrix} x & y & 1 & 0 & 0 & 0 & -x x' & -y x' \\ 0 & 0 & 0 & x & y & 1 & -x y' & -y y' \end{bmatrix} \begin{bmatrix} h_1 \\ h_2 \\ h_3 \\ h_4 \\ h_5 \\ h_6 \\ h_7 \\ h_8 \end{bmatrix} = \begin{bmatrix} x' \\ y' \end{bmatrix} $$
+        <p>Stacking the rows of all \(n\) correspondences gives a linear system, which we solve by least squares.</p>
+        $$ A h = b, \qquad A \in \mathbb{R}^{2n \times 8}, \quad b \in \mathbb{R}^{2n} $$
+        $$ \hat h = \arg\min_h \lVert A h - b \rVert^2 = (A^T A)^{-1} A^T b $$
+        <p>Four correspondences determine \(H\) exactly, but any click error then goes directly into \(H\). We use more than four, so least squares averages out the error. The solution \(\hat h\) is reshaped into \(H\) with 1 as the last entry.</p>
+      </div>
+      <p class="step">Results</p>
+      <p class="sub">Set 1 &middot; St. Petersburg Riverfront (boat5 &rarr; boat6)</p>
+      <div class="g g2">
+        <figure><img src="./PartA/a2_boat_corr_im1.jpg" alt="boat5 with 8 numbered correspondence points" /><figcaption>boat5 (im1), 8 correspondences</figcaption></figure>
+        <figure><img src="./PartA/a2_boat_corr_im2.jpg" alt="boat6 with the matching 8 numbered correspondence points" /><figcaption>boat6 (im2), matching points</figcaption></figure>
+      </div>
+      <div class="eq">$$ H_{5 \to 6} = \begin{bmatrix} 1.2470 & 0.0153 & -1609.39 \\ 0.0976 & 1.1474 & -235.20 \\ 6.955 \times 10^{-5} & -1.360 \times 10^{-5} & 1 \end{bmatrix} $$<small>recovered homography from boat5 to boat6, 8 correspondences</small></div>
+      <p class="sub">Set 2 &middot; Office (office1 &rarr; office2, office3 &rarr; office2)</p>
+      <p>office2 is the reference image, so we recover one homography for each side image.</p>
+      <div class="g g4">
+        <figure><img src="./PartA/a2_office_corr_1.jpg" alt="office1 with 11 numbered correspondence points" /><figcaption>office1, 11 points</figcaption></figure>
+        <figure><img src="./PartA/a2_office_corr_2a.jpg" alt="office2 with the 11 points matching office1" /><figcaption>office2, points matching office1</figcaption></figure>
+        <figure><img src="./PartA/a2_office_corr_3.jpg" alt="office3 with 15 numbered correspondence points" /><figcaption>office3, 15 points</figcaption></figure>
+        <figure><img src="./PartA/a2_office_corr_2b.jpg" alt="office2 with the 15 points matching office3" /><figcaption>office2, points matching office3</figcaption></figure>
+      </div>
+      <div class="eqs two">
+        <div class="eq">$$ H_{1 \to 2} = \begin{bmatrix} 0.5722 & 0.0121 & 704.05 \\ -0.3918 & 0.9889 & 3.82 \\ -4.389 \times 10^{-4} & 3.630 \times 10^{-5} & 1 \end{bmatrix} $$<small>office1 &rarr; office2, 11 correspondences</small></div>
+        <div class="eq">$$ H_{3 \to 2} = \begin{bmatrix} 1.3711 & 0.0103 & -651.64 \\ 0.3578 & 1.2364 & -214.36 \\ 3.921 \times 10^{-4} & -2.069 \times 10^{-5} & 1 \end{bmatrix} $$<small>office3 &rarr; office2, 15 correspondences</small></div>
+      </div>
+      <a class="to-top" href="#top">&uarr; Back to top</a>
+    </section>
+
+    <section class="part" id="a3">
+      <p class="part__label">Part A &middot; A.3</p>
+      <h2 class="part__title">Warping the Images</h2>
+      <p class="step">Method</p>
+      <div class="eq eq-merged">
+        <p>Warping changes where pixels are, not their values. We use inverse warping. For each output pixel we find its source location in the input image with \(H^{-1}\) and interpolate there. Unlike forward warping, this leaves no holes.</p>
+        <p><b>Output size.</b> The four input corners mapped through \(H\) give the bounding box of the warped image.</p>
+        $$ (0, 0), \quad (M-1, 0), \quad (0, N-1), \quad (M-1, N-1) \;\;\xrightarrow{\;H\;}\;\; x_{\min}, x_{\max}, y_{\min}, y_{\max} $$
+        <p><b>Inverse map.</b> Output pixel \((u, v)\) maps back to its source location \((x, y)\).</p>
+        $$ \begin{bmatrix} \tilde x \\ \tilde y \\ \tilde w \end{bmatrix} = H^{-1} \begin{bmatrix} u + x_{\min} \\ v + y_{\min} \\ 1 \end{bmatrix}, \qquad (x, y) = \left( \frac{\tilde x}{\tilde w},\; \frac{\tilde y}{\tilde w} \right) $$
+        <p>Pixel centers lie at integer coordinates. Output pixels whose source falls outside the input image stay black and get alpha 0.</p>
+        <p><b>Interpolation.</b> Nearest neighbor takes the value of the closest pixel.</p>
+        $$ g(u, v) = f\big(\operatorname{round}(x),\; \operatorname{round}(y)\big) $$
+        <p>Bilinear blends the four surrounding pixels, weighted by the fractional offsets \(a = x - x_1\) and \(b = y - y_1\), where \(x_1 = \lfloor x \rfloor\), \(y_1 = \lfloor y \rfloor\), \(x_2 = x_1 + 1\) and \(y_2 = y_1 + 1\).</p>
+        $$ g(u, v) = (1-a)(1-b)\, f_{11} + a(1-b)\, f_{21} + (1-a)\, b\, f_{12} + a\, b\, f_{22}, \qquad f_{ij} = f(x_i, y_j) $$
+      </div>
+      <p class="sub" id="a3-rect">Rectification</p>
+      <p>We click the four corners of a square carpet tile and map them to a \(100 \times 100\) square. Warping with the resulting \(H\) gives a top down view of the floor. The output covers only the part of the photo below the floor&rsquo;s vanishing line, where \(w = 0\). Objects that are not on the floor, such as cabinets and chairs, are stretched.</p>
+      <div class="g g2">
+        <figure><img src="./PartA/a3_rect1_input.jpg" alt="office3 with the four clicked corners of a carpet tile" /><figcaption>office3, clicked carpet tile</figcaption></figure>
+        <figure><img src="./PartA/a3_rect1_bil.jpg" alt="Top-down view of the office3 floor" /><figcaption>office3 floor, rectified (bilinear)</figcaption></figure>
+        <figure><img src="./PartA/a3_rect2_input.jpg" alt="office1 with the four clicked corners of a carpet tile" /><figcaption>office1, clicked carpet tile</figcaption></figure>
+        <figure><img src="./PartA/a3_rect2_bil.jpg" alt="Top-down view of the office1 floor" /><figcaption>office1 floor, rectified (bilinear)</figcaption></figure>
+      </div>
+      <p class="sub" id="a3-compare">Nearest Neighbor vs. Bilinear</p>
+      <figure class="fig panel"><img src="./PartA/a3_compare.jpg" alt="office3 floor rectified with nearest neighbor and with bilinear interpolation, side by side" /><figcaption>office3 floor rectified with nearest neighbor (left) and bilinear (right)</figcaption></figure>
+      <div class="data-table-wrap" style="max-width: 420px; margin: 8px auto 0;">
+        <table class="data-table">
+          <thead><tr><th>Method</th><th>Time (s)</th></tr></thead>
+          <tbody>
+            <tr><td>Nearest neighbor</td><td>0.05</td></tr>
+            <tr><td>Bilinear</td><td>0.13</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <p>Nearest neighbor reads one pixel per output pixel and bilinear reads four, so bilinear is about 2.6 times slower. Where the warp stretches the image, nearest neighbor repeats pixels and gives blocky edges, while bilinear gives smooth transitions with slight blur. Both run in well under a second, so we use bilinear for the mosaics.</p>
+      <a class="to-top" href="#top">&uarr; Back to top</a>
+    </section>
+
+    <section class="part" id="a4">
+      <p class="part__label">Part A &middot; A.4</p>
+      <h2 class="part__title">Blending the Images into a Mosaic</h2>
+      <p class="step">Method</p>
+      <div class="eq eq-merged">
+        <p><b>Registration.</b> We leave one reference image unwarped, boat4 for Set 1, office2 for Set 2 and desk2 for Set 3, and warp the others into its frame with their homographies from A.2.</p>
+        <p><b>Canvas.</b> The canvas covers the reference image and all warped bounding boxes. A translation \(T\) moves its top left corner \((x_{\min}, y_{\min})\) to the origin.</p>
+        $$ T = \begin{bmatrix} 1 & 0 & -x_{\min} \\ 0 & 1 & -y_{\min} \\ 0 & 0 & 1 \end{bmatrix}, \qquad \text{image } i \mapsto T H_i, \qquad \text{reference} \mapsto T $$
+        <p><b>Blending.</b> Each image is weighted by its distance transform \(\alpha_i\), which is 1 at the image center and 0 at its border.</p>
+        $$ I(q) = \frac{\sum_i \alpha_i(q)\, I_i(q)}{\sum_i \alpha_i(q)} $$
+        <p>This feathering blurs fine details that are slightly misaligned, so we use two band blending. The low band \(G_\sigma * I_i\) is feathered, and the high band \(I_i - G_\sigma * I_i\) is taken from the image with the largest \(\alpha_i\).</p>
+      </div>
+      <p class="step">Results</p>
+      <p class="sub">Mosaic 1 &middot; St. Petersburg Riverfront</p>
+      <div class="g g3">
+        <figure><img src="./PartA/set1_boat3.jpg" alt="St. Petersburg riverfront, OpenCV boat3" /><figcaption>boat3</figcaption></figure>
+        <figure><img src="./PartA/set1_boat4.jpg" alt="St. Petersburg riverfront, OpenCV boat4" /><figcaption>boat4</figcaption></figure>
+        <figure><img src="./PartA/set1_boat5.jpg" alt="St. Petersburg riverfront, OpenCV boat5" /><figcaption>boat5</figcaption></figure>
+      </div>
+      <div class="fig panel"><figure><img src="./PartA/a4_mosaic_boat.jpg" alt="Panorama of the St. Petersburg riverfront from boat3, boat4 and boat5" /><figcaption>Mosaic 1, boat3 and boat5 warped onto boat4</figcaption></figure></div>
+      <p class="sub">Mosaic 2 &middot; Office</p>
+      <div class="g g3">
+        <figure><img src="./PartA/set2_3.jpg" alt="Office interior, left view" /><figcaption>Left (office3)</figcaption></figure>
+        <figure><img src="./PartA/set2_2.jpg" alt="Office interior, center view" /><figcaption>Center (office2)</figcaption></figure>
+        <figure><img src="./PartA/set2_1.jpg" alt="Office interior, right view" /><figcaption>Right (office1)</figcaption></figure>
+      </div>
+      <div class="fig panel"><figure><img src="./PartA/a4_mosaic_office.jpg" alt="Panorama of the office from three photos" /><figcaption>Mosaic 2, office1 and office3 warped onto office2</figcaption></figure></div>
+      <p class="sub">Mosaic 3 &middot; Desk</p>
+      <div class="g g3">
+        <figure><img src="./PartA/set3_1.jpg" alt="Desk with a circuit board and a tray, view 1 of 3" /><figcaption>Left (desk1)</figcaption></figure>
+        <figure><img src="./PartA/set3_2.jpg" alt="Desk with a circuit board and a tray, view 2 of 3" /><figcaption>Center (desk2)</figcaption></figure>
+        <figure><img src="./PartA/set3_3.jpg" alt="Desk with a circuit board and a tray, view 3 of 3" /><figcaption>Right (desk3)</figcaption></figure>
+      </div>
+      <div class="fig panel"><figure><img src="./PartA/a4_mosaic_desk.jpg" alt="Mosaic of the desk from three photos" /><figcaption>Mosaic 3, desk1 and desk3 warped onto desk2</figcaption></figure></div>
+      <a class="to-top" href="#top">&uarr; Back to top</a>
+    </section>
+
+    <section class="part" id="a5">
+      <p class="part__label">Part A &middot; A.5 &middot; Bells &amp; Whistles</p>
+      <h2 class="part__title">Spherical Mapping</h2>
+      <p class="step">Method</p>
+      <div class="eq eq-merged">
+        <p>A planar mosaic stretches content far from the reference view, since positions on the plane grow with \(\tan\theta\). We instead project the mosaic onto a sphere around the camera. An output pixel \((u, v)\) corresponds to longitude \(\theta\) and latitude \(\phi\), with \(f\) pixels per radian.</p>
+        $$ \theta = \frac{u}{f}, \qquad \phi = \frac{v}{f} $$
+        <p>The direction \((\theta, \phi)\) is the ray \((\sin\theta\cos\phi,\, \sin\phi,\, \cos\theta\cos\phi)\). It meets the reference image plane at the point below, where \((c_x, c_y)\) is the reference image center.</p>
+        $$ x = f \tan\theta + c_x, \qquad y = \frac{f \tan\phi}{\cos\theta} + c_y $$
+        <p>We map this point into each original image with \(H_i^{-1}\) and sample it bilinearly. Sampling the original images directly, rather than the warped planar mosaic, keeps the full resolution. The images are blended with the two band blending from A.4. The output covers the angular range of all image borders. For the boat set, \(f = 4370\) pixels follows from the EXIF focal length of 25 mm. For the office and desk sets, which have no focal length metadata, we choose the \(f\) that gives the least distortion.</p>
+      </div>
+      <p class="step">Results</p>
+      <p class="sub">St. Petersburg Riverfront</p>
+      <div class="g g2">
+        <figure><img src="./PartA/a4_mosaic_boat.jpg" alt="Planar mosaic of the riverfront" /><figcaption>Planar (A.4)</figcaption></figure>
+        <figure><img src="./PartA/a5_spherical_boat.jpg" alt="Spherical mosaic of the riverfront" /><figcaption>Spherical</figcaption></figure>
+      </div>
+      <p class="sub">Office</p>
+      <div class="g g2">
+        <figure><img src="./PartA/a4_mosaic_office.jpg" alt="Planar mosaic of the office" /><figcaption>Planar (A.4)</figcaption></figure>
+        <figure><img src="./PartA/a5_spherical_office.jpg" alt="Spherical mosaic of the office" /><figcaption>Spherical</figcaption></figure>
+      </div>
+      <p class="sub">Desk</p>
+      <div class="g g2">
+        <figure><img src="./PartA/a4_mosaic_desk.jpg" alt="Planar mosaic of the desk" /><figcaption>Planar (A.4)</figcaption></figure>
+        <figure><img src="./PartA/a5_spherical_desk.jpg" alt="Spherical mosaic of the desk" /><figcaption>Spherical</figcaption></figure>
+      </div>
+      <a class="to-top" href="#top">&uarr; Back to top</a>
+    </section>
+
+    <h2 class="part-heading" id="partb">Part B &middot; Coming Soon</h2>
+  </main>
+
+  <footer class="site-footer">
+    <div class="site-footer__inner">
+      &copy; <span id="yr"></span> Andrew Park &middot; CS280A, UC Berkeley
+    </div>
+  </footer>
+  <script>document.getElementById("yr").textContent = new Date().getFullYear();</script>
+  <script src="../../assets/lightbox.js"></script>
+</body>
+</html>
