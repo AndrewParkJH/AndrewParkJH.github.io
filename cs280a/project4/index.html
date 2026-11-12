@@ -174,13 +174,21 @@
     <h1 class="page-title" id="top">Image Warping and Mosaicing</h1>
     <p class="lede">
       In Part A, we shoot photos from a fixed center of projection, recover the
-      homographies between them, warp images with inverse warping, and blend them into panoramic mosaics.
+      homographies between them, warp images with inverse warping, and blend them into panoramic mosaics. In Part B, we
+      detect, describe and match features automatically and estimate the homographies with RANSAC.
     </p>
 
     <div class="glance-group">
       <h2>Part A</h2>
       <div class="glance">
         <a href="#a1"><span class="num">A.1</span><span class="ttl">Shooting the Pictures</span></a><a href="#a2"><span class="num">A.2</span><span class="ttl">Recovering Homographies</span></a><a href="#a3"><span class="num">A.3</span><span class="ttl">Warping &amp; Rectification</span></a><a href="#a4"><span class="num">A.4</span><span class="ttl">Mosaic Blending</span></a><a href="#a5"><span class="num">A.5</span><span class="ttl">Spherical Mapping</span></a>
+      </div>
+    </div>
+
+        <div class="glance-group">
+      <h2>Part B</h2>
+      <div class="glance">
+        <a href="#b1"><span class="num">B.1</span><span class="ttl">Harris Corners &amp; ANMS</span></a><a href="#b2"><span class="num">B.2</span><span class="ttl">Feature Descriptors</span></a><a href="#b3"><span class="num">B.3</span><span class="ttl">Feature Matching</span></a><a href="#b4"><span class="num">B.4</span><span class="ttl">RANSAC &amp; Mosaics</span></a><a href="#b5"><span class="num">B.5</span><span class="ttl">Rotation Invariance</span></a>
       </div>
     </div>
 
@@ -354,7 +362,134 @@
       <a class="to-top" href="#top">&uarr; Back to top</a>
     </section>
 
-    <h2 class="part-heading" id="partb">Part B &middot; Coming Soon</h2>
+    <h2 class="part-heading" id="partb">Part B &middot; Feature Matching for Autostitching</h2>
+
+    <section class="part" id="b1">
+      <p class="part__label">Part B &middot; B.1</p>
+      <h2 class="part__title">Harris Corner Detection</h2>
+      <p class="step">Method</p>
+      <div class="eq eq-merged">
+        <p>We detect corners at a single scale with the provided Harris detector. The Harris matrix is the Gaussian weighted outer product of the image gradient, and the corner strength is the harmonic mean of its eigenvalues.</p>
+        $$ H(x, y) = \nabla I \, \nabla I^T * g_{\sigma}, \qquad f(x, y) = \frac{\det H}{\operatorname{tr} H} = \frac{\lambda_1 \lambda_2}{\lambda_1 + \lambda_2} $$
+        <p>Local maxima of \(f\) are kept as corners. These corners are numerous and cluster in textured regions, so we select a subset with adaptive non maximal suppression (ANMS). For each corner \(x_i\) we compute its suppression radius \(r_i\), the distance to the nearest corner that is clearly stronger.</p>
+        $$ r_i = \min_j \lVert x_i - x_j \rVert \quad \text{such that} \quad f(x_i) < c_{\text{robust}} \, f(x_j) $$
+        <p>Following the paper, we use \(c_{\text{robust}} = 0.9\) and keep the \(n_{ip} = 500\) corners with the largest radii. The selected corners are spread evenly over the image, which matters when two images overlap only in a small region.</p>
+      </div>
+      <p class="step">Results</p>
+      <figure class="fig w70"><img src="./PartB/b_1_boat2_harris.jpg" alt="boat2 with all Harris corners overlaid" /><figcaption>All Harris corners on boat2</figcaption></figure>
+      <figure class="fig w70"><img src="./PartB/b_1_boat2_strongest.jpg" alt="boat2 with the 500 strongest Harris corners overlaid" /><figcaption>500 strongest corners by response</figcaption></figure>
+      <figure class="fig w70"><img src="./PartB/b_1_boat2_anms.jpg" alt="boat2 with the 500 corners selected by ANMS overlaid" /><figcaption>500 corners selected by ANMS</figcaption></figure>
+      <a class="to-top" href="#top">&uarr; Back to top</a>
+    </section>
+
+    <section class="part" id="b2">
+      <p class="part__label">Part B &middot; B.2</p>
+      <h2 class="part__title">Feature Descriptor Extraction</h2>
+      <p class="step">Method</p>
+      <div class="eq eq-merged">
+        <p>For each corner we describe an axis aligned \(40 \times 40\) window with an \(8 \times 8\) patch. We blur the image with a Gaussian (\(\sigma = 5\), kernel size 31) and downsample it by a factor of 5, then take the \(8 \times 8\) patch around the scaled corner location. Each patch value summarizes a \(5 \times 5\) region of the original image, so the descriptor is insensitive to small errors in corner location, and the blur prevents aliasing. We then apply bias and gain normalization.</p>
+        $$ d = \frac{p - \mu_p}{\sigma_p} $$
+        <p>Here \(p\) is the patch, and \(\mu_p\) and \(\sigma_p\) are its mean and standard deviation. The normalized descriptor is invariant to changes in brightness and contrast, and its 64 values form the feature vector. Following the specification, we skip the wavelet transform.</p>
+      </div>
+      <p class="step">Results</p>
+      <figure class="fig"><img src="./PartB/b_2_boat2_descriptors.jpg" alt="Eight 40 by 40 windows from boat2 and their 8 by 8 descriptors" /><figcaption>40 &times; 40 windows (top) and their normalized 8 &times; 8 descriptors (bottom) on boat2</figcaption></figure>
+      <a class="to-top" href="#top">&uarr; Back to top</a>
+    </section>
+
+    <section class="part" id="b3">
+      <p class="part__label">Part B &middot; B.3</p>
+      <h2 class="part__title">Feature Matching</h2>
+      <p class="step">Method</p>
+      <div class="eq eq-merged">
+        <p>We match descriptors by their nearest neighbors in Euclidean distance. For each descriptor in the first image, we find its closest and second closest descriptors in the second image, with squared errors \(e_{1NN}\) and \(e_{2NN}\), and keep the match only if their ratio is small.</p>
+        $$ \frac{e_{1NN}}{e_{2NN}} < 0.6 $$
+        <p>A correct match is much closer than any other descriptor, while an ambiguous feature such as a repeated window has several similar candidates and a ratio near 1. We chose the threshold from Figure 6b of the paper, where correct matches outnumber incorrect matches below a ratio of about 0.65.</p>
+      </div>
+      <p class="step">Results</p>
+      <figure class="fig"><img src="./PartB/b_3_boat2_boat3_matches.jpg" alt="Lines connecting matched features between boat2 and boat3" /><figcaption>Matched features between boat2 and boat3</figcaption></figure>
+      <a class="to-top" href="#top">&uarr; Back to top</a>
+    </section>
+
+    <section class="part" id="b4">
+      <p class="part__label">Part B &middot; B.4</p>
+      <h2 class="part__title">RANSAC for Robust Homography</h2>
+      <p class="step">Method</p>
+      <div class="eq eq-merged">
+        <p>The remaining matches still contain outliers, and a least squares fit of \(H\) is sensitive to them. We therefore estimate \(H\) with 4 point RANSAC. In each iteration we select 4 matches at random, compute \(H\) exactly with <code>computeH</code> from Part A, and count the matches that \(H\) maps close to their partners.</p>
+        $$ \lVert p_i' - H p_i \rVert < \varepsilon, \qquad \varepsilon = 2 \text{ pixels} $$
+        <p>We keep the largest inlier set and refit \(H\) by least squares on all of its inliers. The mosaics are produced with the warping and blending from Part A, using the same reference images.</p>
+        <p>The number of iterations \(N\) is chosen so that, with probability \(p\), at least one random sample contains only inliers. A sample of 4 matches is all inliers with probability \(w^4\), where \(w\) is the inlier fraction.</p>
+        $$ N = \frac{\log(1 - p)}{\log(1 - w^4)} $$
+        <p>With \(p = 0.999\) and \(w = 0.3\), this gives \(N \approx 850\), and we run 1000 iterations.</p>
+      </div>
+      <p class="step">Results</p>
+      <p class="sub">RANSAC on boat3 and boat4</p>
+      <figure class="fig"><img src="./PartB/b_4_boat3_boat4_ransac.jpg" alt="Feature matches between boat3 and boat4, inliers in yellow and outliers in red" /><figcaption>Matches accepted by RANSAC (yellow) and rejected (red) between boat3 and boat4</figcaption></figure>
+      <div class="data-table-wrap" style="max-width: 560px; margin: 8px auto 0;">
+        <table class="data-table">
+          <thead><tr><th>Pair</th><th>Matches</th><th>RANSAC inliers</th><th>Inlier ratio</th></tr></thead>
+          <tbody>
+            <tr><td>boat3 &rarr; boat4</td><td>112</td><td>72</td><td>64.3%</td></tr>
+            <tr><td>boat5 &rarr; boat4</td><td>156</td><td>90</td><td>57.7%</td></tr>
+            <tr><td>office1 &rarr; office2</td><td>74</td><td>30</td><td>40.5%</td></tr>
+            <tr><td>office3 &rarr; office2</td><td>83</td><td>17</td><td>20.5%</td></tr>
+            <tr><td>desk1 &rarr; desk2</td><td>204</td><td>157</td><td>77.0%</td></tr>
+            <tr><td>desk3 &rarr; desk2</td><td>227</td><td>168</td><td>74.0%</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <p class="sub">Manual vs. Automatic Stitching</p>
+      <figure class="fig"><img src="./PartA/a4_mosaic_boat.jpg" alt="Manual mosaic of the riverfront" /><figcaption>Set 1, manual</figcaption></figure>
+      <figure class="fig"><img src="./PartB/b_4_boat_auto.jpg" alt="Automatic mosaic of the riverfront" /><figcaption>Set 1, automatic</figcaption></figure>
+      <div class="g g2">
+        <figure><img src="./PartA/a4_mosaic_office.jpg" alt="Manual mosaic of the office" /><figcaption>Set 2, manual</figcaption></figure>
+        <figure><img src="./PartB/b_4_office_auto.jpg" alt="Automatic mosaic of the office" /><figcaption>Set 2, automatic</figcaption></figure>
+      </div>
+      <div class="g g2">
+        <figure><img src="./PartA/a4_mosaic_desk.jpg" alt="Manual mosaic of the desk" /><figcaption>Set 3, manual</figcaption></figure>
+        <figure><img src="./PartB/b_4_desk_auto.jpg" alt="Automatic mosaic of the desk" /><figcaption>Set 3, automatic</figcaption></figure>
+      </div>
+      <a class="to-top" href="#top">&uarr; Back to top</a>
+    </section>
+
+    <section class="part" id="b5">
+      <p class="part__label">Part B &middot; B.5 &middot; Bells &amp; Whistles</p>
+      <h2 class="part__title">Rotation Invariant Descriptors</h2>
+      <p class="step">Method</p>
+      <div class="eq eq-merged">
+        <p>The descriptor in B.2 is axis aligned, so it changes when the image rotates. We add rotation invariance as in the paper. Each corner gets an orientation \(\theta\) from the gradient of the image blurred with \(\sigma_o = 4.5\).</p>
+        $$ u = \nabla_{\sigma_o} I(x, y), \qquad [\cos\theta, \sin\theta] = \frac{u}{\lVert u \rVert} $$
+        <p>The large blur makes the gradient vary smoothly across the image, so the orientation is robust to small errors in corner location. We then sample the \(8 \times 8\) patch from the blurred image on a grid rotated by \(\theta\), with a spacing of 5 pixels and bilinear interpolation, and apply the same bias and gain normalization as in B.2. A feature in a rotated image produces the same descriptor.</p>
+      </div>
+      <p class="step">Results</p>
+      <p>We test the descriptor on the desk set. We keep desk1, rotate desk2 by 90&deg; and rotate desk3 by 180&deg;.</p>
+      <figure class="fig"><img src="./PartB/b_5_rotated.jpg" alt="The three desk images with desk2 and desk3 rotated" /><figcaption>desk1, desk2 rotated by 90&deg;, and desk3 rotated by 180&deg;</figcaption></figure>
+      <p class="sub">Axis Aligned vs. Rotation Invariant Matching</p>
+      <div class="g g2">
+        <figure><img src="./PartB/b_5_matches_21_axis.jpg" alt="Axis aligned matches, desk2 rotated by 90&deg; to desk1" /><figcaption>Axis aligned, desk1 and desk2</figcaption></figure>
+        <figure><img src="./PartB/b_5_matches_21_rot.jpg" alt="Rotation invariant matches, desk2 rotated by 90&deg; to desk1" /><figcaption>Rotation invariant, desk1 and desk2</figcaption></figure>
+      </div>
+      <div class="g g2">
+        <figure><img src="./PartB/b_5_matches_32_axis.jpg" alt="Axis aligned matches, desk3 rotated by 180&deg; to desk2 rotated by 90&deg;" /><figcaption>Axis aligned, desk2 and desk3</figcaption></figure>
+        <figure><img src="./PartB/b_5_matches_32_rot.jpg" alt="Rotation invariant matches, desk3 rotated by 180&deg; to desk2 rotated by 90&deg;" /><figcaption>Rotation invariant, desk2 and desk3</figcaption></figure>
+      </div>
+      <div class="data-table-wrap" style="max-width: 520px; margin: 8px auto 0;">
+        <table class="data-table">
+          <thead>
+            <tr><th rowspan="2">Pair</th><th>Axis aligned</th><th>Rotation invariant</th></tr>
+            <tr><th>matches / inliers</th><th>matches / inliers</th></tr>
+          </thead>
+          <tbody>
+            <tr><td>desk1 &rarr; desk2</td><td>40 / 5</td><td>211 / 182</td></tr>
+            <tr><td>desk2 &rarr; desk3</td><td>50 / 9</td><td>233 / 206</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <p>With axis aligned descriptors, only 5 and 9 matches survive RANSAC, too few for a reliable homography. Rotation invariant descriptors increase the RANSAC inliers to 182 and 206, an increase of 177 and 197 correspondences.</p>
+      <p class="sub">Mosaic from Rotated Images</p>
+      <figure class="fig w70"><img src="./PartB/b_5_result.jpg" alt="Desk mosaic built from the rotated images" /><figcaption>Mosaic of desk1, desk2 rotated by 90&deg; and desk3 rotated by 180&deg;, in the frame of desk1</figcaption></figure>
+      <a class="to-top" href="#top">&uarr; Back to top</a>
+    </section>
   </main>
 
   <footer class="site-footer">
